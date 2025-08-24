@@ -1,1 +1,1513 @@
 
+```html
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calculateur de Mur de Clôture</title>
+  <style>
+    :root {
+      --primary: #3498db;
+      --primary-dark: #2980b9;
+      --secondary: #2ecc71;
+      --danger: #e74c3c;
+      --warning: #f39c12;
+      --light: #f8f9fa;
+      --dark: #343a40;
+      --gray: #6c757d;
+      --border: #dee2e6;
+      --shadow: rgba(0,0,0,0.1);
+      --card-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #333;
+      line-height: 1.6;
+      padding: 1rem;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: white;
+      padding: 1rem;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      opacity: 0.9;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .stepper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+      margin-bottom: 1.5rem;
+      justify-content: center;
+    }
+
+    .step {
+      padding: 0.5rem 0.75rem;
+      background-color: rgba(255,255,255,0.2);
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      color: white;
+      border: 1px solid transparent;
+      text-align: center;
+      min-width: 60px;
+    }
+
+    .step:hover {
+      background-color: rgba(255,255,255,0.3);
+    }
+
+    .step.active {
+      background-color: white;
+      color: var(--primary);
+      border-color: var(--primary);
+      font-weight: 600;
+      transform: translateY(-1px);
+    }
+
+    .step.completed {
+      background-color: var(--secondary);
+      color: white;
+      border-color: var(--secondary);
+    }
+
+    .screen {
+      display: none;
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 1.5rem;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    h2 {
+      color: var(--primary);
+      margin-bottom: 1.25rem;
+      font-size: 1.3rem;
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.4rem;
+      font-weight: 600;
+      color: var(--dark);
+      font-size: 0.95rem;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: var(--transition);
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+
+    .input-group {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .input-group input, .input-group select {
+      flex: 1;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 0.75rem;
+      }
+      
+      .container {
+        padding: 0;
+      }
+      
+      h1 {
+        font-size: 1.5rem;
+      }
+      
+      .subtitle {
+        font-size: 0.9rem;
+      }
+      
+      .screen {
+        padding: 1.25rem;
+      }
+      
+      .stepper {
+        gap: 0.15rem;
+        margin-bottom: 1rem;
+      }
+      
+      .step {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.7rem;
+        min-width: 45px;
+      }
+      
+      h2 {
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+      }
+      
+      .input-group {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      
+      input, select, textarea {
+        padding: 0.6rem;
+        font-size: 0.95rem;
+      }
+      
+      label {
+        font-size: 0.9rem;
+      }
+      
+      .btn-group {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+      
+      button {
+        padding: 0.75rem;
+        font-size: 0.95rem;
+      }
+      
+      .summary-item {
+        font-size: 0.9rem;
+      }
+      
+      table {
+        font-size: 0.85rem;
+      }
+      
+      th, td {
+        padding: 0.5rem;
+      }
+    }
+
+    .btn-group {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1.5rem;
+      gap: 1rem;
+    }
+
+    button {
+      padding: 0.75rem 1.25rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: var(--transition);
+      flex: 1;
+      min-height: 44px; /* Accessible touch target */
+    }
+
+    .btn-prev {
+      background-color: var(--gray);
+      color: white;
+    }
+
+    .btn-next, .btn-export {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .btn-export.secondary {
+      background-color: var(--secondary);
+    }
+
+    .btn-prev:hover {
+      background-color: #5a6268;
+      transform: translateY(-1px);
+    }
+
+    .btn-next:hover, .btn-export:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    }
+
+    .btn-export.secondary:hover {
+      background-color: #27ae60;
+      box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+    }
+
+    .error {
+      color: var(--danger);
+      font-size: 0.85rem;
+      margin-top: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .summary-box {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      padding: 1.25rem;
+      border-radius: 8px;
+      margin-bottom: 1.25rem;
+      border-left: 3px solid var(--primary);
+    }
+
+    .summary-title {
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 0.75rem;
+      font-size: 1rem;
+    }
+
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.4rem;
+      padding: 0.4rem 0;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      font-size: 0.95rem;
+    }
+
+    .summary-item:last-child {
+      border-bottom: none;
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--primary-dark);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      background: white;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      font-size: 0.9rem;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.6rem;
+      text-align: left;
+    }
+
+    th {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8f9fa;
+    }
+
+    tr:hover {
+      background-color: #e3f2fd;
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      padding: 0.6rem 1.25rem;
+      border-radius: 20px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: var(--transition);
+      border: 2px solid var(--primary);
+      background: white;
+      color: var(--primary);
+      min-height: 40px;
+    }
+
+    .action-btn:hover {
+      background: var(--primary);
+      color: white;
+      transform: translateY(-1px);
+    }
+
+    .notification {
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      padding: 0.75rem 1.25rem;
+      border-radius: 6px;
+      color: white;
+      font-weight: 500;
+      font-size: 0.9rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 1000;
+      transition: transform 0.3s ease;
+      max-width: 90%;
+      text-align: center;
+    }
+
+    .notification.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .notification.success {
+      background: var(--secondary);
+    }
+
+    .notification.error {
+      background: var(--danger);
+    }
+
+    .loading {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 0.4rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .icon {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      margin-right: 0.4rem;
+    }
+
+    /* Mobile-specific optimizations */
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.3rem;
+      }
+      
+      .subtitle {
+        font-size: 0.8rem;
+      }
+      
+      .step {
+        padding: 0.3rem 0.5rem;
+        font-size: 0.65rem;
+        min-width: 40px;
+      }
+      
+      .screen {
+        padding: 1rem;
+      }
+      
+      h2 {
+        font-size: 1rem;
+      }
+      
+      .form-group {
+        margin-bottom: 1rem;
+      }
+      
+      .summary-box {
+        padding: 1rem;
+      }
+      
+      .summary-title {
+        font-size: 0.9rem;
+      }
+      
+      .summary-item {
+        font-size: 0.85rem;
+      }
+      
+      table {
+        font-size: 0.8rem;
+      }
+      
+      th, td {
+        padding: 0.4rem;
+      }
+      
+      .actions {
+        gap: 0.5rem;
+      }
+      
+      .action-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+      }
+    }
+
+    /* Very small screens */
+    @media (max-width: 360px) {
+      body {
+        padding: 0.5rem;
+      }
+      
+      h1 {
+        font-size: 1.2rem;
+      }
+      
+      .step {
+        padding: 0.25rem 0.4rem;
+        font-size: 0.6rem;
+        min-width: 35px;
+      }
+      
+      input, select, textarea {
+        padding: 0.5rem;
+        font-size: 0.9rem;
+      }
+      
+      button {
+        padding: 0.6rem;
+        font-size: 0.9rem;
+      }
+    }
+
+    /* Landscape mode on mobile */
+    @media (max-height: 500px) and (orientation: landscape) {
+      body {
+        padding: 0.5rem;
+      }
+      
+      .screen {
+        padding: 1rem;
+      }
+      
+      .btn-group {
+        margin-top: 1rem;
+      }
+    }
+
+    /* Ensure proper scrolling on mobile */
+    @media (max-width: 768px) {
+      .container {
+        height: auto;
+        min-height: calc(100vh - 2rem);
+      }
+      
+      .screen {
+        margin-bottom: 1rem;
+      }
+    }
+
+    /* Optimize for touch */
+    input, select, textarea, button {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      touch-action: manipulation;
+    }
+
+    /* Prevent zoom on iOS */
+    @media screen and (-webkit-min-device-pixel-ratio: 2) {
+      input, select, textarea {
+        font-size: 16px;
+      }
+    }
+
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --dark: #f8f9fa;
+        --light: #343a40;
+      }
+      
+      body {
+        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+      }
+      
+      .screen {
+        background: #2c3e50;
+        color: white;
+      }
+      
+      input, select, textarea {
+        background: #34495e;
+        color: white;
+        border-color: #4a5568;
+      }
+      
+      .summary-box {
+        background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+      }
+      
+      tr:nth-child(even) {
+        background-color: #34495e;
+      }
+      
+      tr:hover {
+        background-color: #3a506b;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🏗️ Calculateur de Mur de Clôture</h1>
+      <p class="subtitle">Calculez les quantités et coûts pour la construction d'un mur de clôture autour d'une parcelle</p>
+    </header>
+
+    <div class="stepper" id="stepper">
+      <!-- Dynamically filled -->
+    </div>
+
+    <main>
+      <!-- Écran 1 : Paramètres parcelle -->
+      <section id="screen1" class="screen active">
+        <h2>📏 Paramètres de la parcelle</h2>
+        <div class="form-group">
+          <label for="parcelType">🏷️ Type de parcelle (optionnel)</label>
+          <input type="text" id="parcelType" placeholder="Ex: Résidentielle, Agricole...">
+        </div>
+        <div class="form-group">
+          <label>📐 Dimensions</label>
+          <div class="input-group">
+            <input type="text" id="length" placeholder="Longueur (m)" inputmode="decimal">
+            <input type="text" id="width" placeholder="Largeur (m)" inputmode="decimal">
+          </div>
+          <p style="text-align: center; margin: 0.4rem 0; color: var(--gray); font-size: 0.9rem;">OU</p>
+          <input type="text" id="perimeter" placeholder="Périmètre total (m)" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label for="wallWidth">📏 Largeur du mur (m)</label>
+          <input type="text" id="wallWidth" value="0.2" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label for="wallHeight">📐 Hauteur du mur (m)</label>
+          <input type="text" id="wallHeight" value="2.0" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label for="currency">💱 Devise</label>
+          <select id="currency">
+            <option value="XOF">XOF (Franc CFA)</option>
+            <option value="EUR">EUR (Euro)</option>
+            <option value="USD">USD (Dollar US)</option>
+          </select>
+        </div>
+        <div class="summary-box">
+          <div class="summary-title">📊 Calculs automatiques</div>
+          <div class="summary-item">
+            <span>📏 Périmètre:</span>
+            <span id="displayPerimeter">-- m</span>
+          </div>
+          <div class="summary-item">
+            <span>📐 Surface:</span>
+            <span id="displayArea">-- m²</span>
+          </div>
+        </div>
+        <div class="btn-group">
+          <button class="btn-next" onclick="nextScreen(1)">🚀 Commencer le calcul</button>
+        </div>
+      </section>
+
+      <!-- Écran 2 : Béton de propreté -->
+      <section id="screen2" class="screen">
+        <h2>🧹 Béton de propreté</h2>
+        <div class="form-group">
+          <label for="cleaningWidth">📏 Largeur de la fouille (m)</label>
+          <input type="text" id="cleaningWidth" value="0.6" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label for="cleaningThickness">📐 Épaisseur (m)</label>
+          <input type="text" id="cleaningThickness" value="0.1" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label for="cementDosage">🧱 Dosage ciment (kg/m³)</label>
+          <input type="text" id="cementDosage" value="350" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label>💰 Prix unitaires</label>
+          <div class="input-group">
+            <input type="text" id="cementPrice" placeholder="Ciment (XOF/sac 50kg)" value="70000" inputmode="decimal">
+            <input type="text" id="gravelPrice" placeholder="Gravier (XOF/m³)" value="20000" inputmode="decimal">
+            <input type="text" id="sandPrice" placeholder="Sable (XOF/m³)" value="4000" inputmode="decimal">
+          </div>
+        </div>
+        <div class="summary-box">
+          <div class="summary-title">📊 Résultats</div>
+          <div class="summary-item">
+            <span>㎥ Volume béton:</span>
+            <span id="cleaningVolume">-- m³</span>
+          </div>
+          <div class="summary-item">
+            <span>🧱 Ciment:</span>
+            <span id="cleaningCement">-- kg</span>
+          </div>
+          <div class="summary-item">
+            <span>📦 Sacs de ciment:</span>
+            <span id="cleaningSacks">-- sacs</span>
+          </div>
+          <div class="summary-item">
+            <span>💰 Coût total:</span>
+            <span id="cleaningCost">-- XOF</span>
+          </div>
+        </div>
+        <div class="btn-group">
+          <button class="btn-prev" onclick="prevScreen(2)">⬅️ Précédent</button>
+          <button class="btn-next" onclick="nextScreen(2)">Suivant ➡️</button>
+        </div>
+      </section>
+
+      <!-- Écran 3 : Semelle filante -->
+      <section id="screen3" class="screen">
+        <h2>磉 Semelle filante</h2>
+        <div class="form-group">
+          <label for="footingWidth">📏 Largeur de la fouille (m)</label>
+          <input type="text" id="footingWidth" value="0.6" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label for="footingHeight">📐 Épaisseur (m)</label>
+          <input type="text" id="footingHeight" value="0.3" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label for="footingCementDosage">🧱 Dosage ciment (kg/m³)</label>
+          <input type="text" id="footingCementDosage" value="350" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label for="rebarDiameterLong">⌀ Diamètre acier longitudinal (mm)</label>
+          <input type="text" id="rebarDiameterLong" value="12" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label for="rebarCountLong">🔢 Nombre de barres longitudinales</label>
+          <input type="text" id="rebarCountLong" value="4" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label for="rebarDiameterTrans">⌀ Diamètre étriers (mm)</label>
+          <input type="text" id="rebarDiameterTrans" value="8" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label for="rebarSpacingTrans">📐 Espacement des étriers (mm)</label>
+          <input type="text" id="rebarSpacingTrans" value="200" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label for="steelPrice">💰 Prix de l'acier (XOF/kg)</label>
+          <input type="text" id="steelPrice" value="450" inputmode="decimal">
+        </div>
+        <div class="summary-box">
+          <div class="summary-title">📊 Résultats</div>
+          <div class="summary-item">
+            <span>㎥ Volume béton:</span>
+            <span id="footingVolume">-- m³</span>
+          </div>
+          <div class="summary-item">
+            <span>钢筋 Acier longitudinal:</span>
+            <span id="footingSteelLong">-- kg</span>
+          </div>
+          <div class="summary-item">
+            <span>⭕ Étriers:</span>
+            <span id="footingSteelTrans">-- kg</span>
+          </div>
+          <div class="summary-item">
+            <span>💰 Coût total:</span>
+            <span id="footingCost">-- XOF</span>
+          </div>
+        </div>
+        <div class="btn-group">
+          <button class="btn-prev" onclick="prevScreen(3)">⬅️ Précédent</button>
+          <button class="btn-next" onclick="nextScreen(3)">Suivant ➡️</button>
+        </div>
+      </section>
+
+      <!-- Écran 4 : Poteaux amorces -->
+      <section id="screen4" class="screen">
+        <h2>เสา Poteaux amorces</h2>
+        <div class="form-group">
+          <label for="postWidth">📏 Largeur poteau (m)</label>
+          <input type="text" id="postWidth" value="0.3" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label for="postLength">📐 Longueur poteau (m)</label>
+          <input type="text" id="postLength" value="0.3" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label for="postHeight">📐 Hauteur amorce (m)</label>
+          <input type="text" id="postHeight" value="0.5" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label for="postCount">🔢 Nombre de poteaux</label>
+          <input type="text" id="postCount" value="10" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label for="postCementDosage">🧱 Dosage ciment (kg/m³)</label>
+          <input type="text" id="postCementDosage" value="350" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label for="postRebarCount">🔢 Barres longitudinales par poteau</label>
+          <input type="text" id="postRebarCount" value="4" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label for="postRebarDiameter">⌀ Diamètre acier (mm)</label>
+          <input type="text" id="postRebarDiameter" value="12" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label for="postFrameSpacing">📐 Espacement cadres (m)</label>
+          <input type="text" id="postFrameSpacing" value="0.2" inputmode="decimal">
+        </div>
+        <div class="summary-box">
+          <div class="summary-title">📊 Résultats</div>
+          <div class="summary-item">
+            <span>㎥ Volume béton:</span>
+            <span id="postVolume">-- m³</span>
+          </div>
+          <div class="summary-item">
+            <span>钢筋 Acier longitudinal:</span>
+            <span id="postSteelLong">-- kg</span>
+          </div>
+          <div class="summary-item">
+            <span>🔲 Cadres:</span>
+            <span id="postSteelFrames">-- kg</span>
+          </div>
+          <div class="summary-item">
+            <span>💰 Coût total:</span>
+            <span id="postCost">-- XOF</span>
+          </div>
+        </div>
+        <div class="btn-group">
+          <button class="btn-prev" onclick="prevScreen(4)">⬅️ Précédent</button>
+          <button class="btn-next" onclick="nextScreen(4)">Suivant ➡️</button>
+        </div>
+      </section>
+
+      <!-- Écran 5 : Poteaux en élévation -->
+      <section id="screen5" class="screen">
+        <h2>🏗️ Poteaux en élévation</h2>
+        <div class="form-group">
+          <label for="elevPostHeight">📐 Hauteur en élévation (m)</label>
+          <input type="text" id="elevPostHeight" value="2.0" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label for="elevPostRebarCount">🔢 Barres longitudinales par poteau</label>
+          <input type="text" id="elevPostRebarCount" value="4" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label for="elevPostRebarDiameter">⌀ Diamètre acier (mm)</label>
+          <input type="text" id="elevPostRebarDiameter" value="12" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label for="elevPostFrameSpacing">📐 Espacement cadres (m)</label>
+          <input type="text" id="elevPostFrameSpacing" value="0.2" inputmode="decimal">
+        </div>
+        <div class="summary-box">
+          <div class="summary-title">📊 Résultats</div>
+          <div class="summary-item">
+            <span>㎥ Volume béton:</span>
+            <span id="elevPostVolume">-- m³</span>
+          </div>
+          <div class="summary-item">
+            <span>钢筋 Acier longitudinal:</span>
+            <span id="elevPostSteelLong">-- kg</span>
+          </div>
+          <div class="summary-item">
+            <span>🔲 Cadres:</span>
+            <span id="elevPostSteelFrames">-- kg</span>
+          </div>
+          <div class="summary-item">
+            <span>💰 Coût total:</span>
+            <span id="elevPostCost">-- XOF</span>
+          </div>
+        </div>
+        <div class="btn-group">
+          <button class="btn-prev" onclick="prevScreen(5)">⬅️ Précédent</button>
+          <button class="btn-next" onclick="nextScreen(5)">Suivant ➡️</button>
+        </div>
+      </section>
+
+      <!-- Écran 6 : Chaînages -->
+      <section id="screen6" class="screen">
+        <h2>⛓️ Chaînage bas & Couronnement</h2>
+        <div class="form-group">
+          <label for="beamWidth">📏 Largeur chaînage (m)</label>
+          <input type="text" id="beamWidth" value="0.2" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label for="beamHeight">📐 Hauteur chaînage (m)</label>
+          <input type="text" id="beamHeight" value="0.2" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label for="beamRebarDiameter">⌀ Diamètre acier (mm)</label>
+          <input type="text" id="beamRebarDiameter" value="10" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label for="beamRebarCount">🔢 Nombre de barres</label>
+          <input type="text" id="beamRebarCount" value="4" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label for="beamRebarSpacing">📐 Espacement cadres (mm)</label>
+          <input type="text" id="beamRebarSpacing" value="200" inputmode="decimal">
+        </div>
+        <div class="summary-box">
+          <div class="summary-title">📊 Résultats</div>
+          <div class="summary-item">
+            <span>㎥ Volume béton:</span>
+            <span id="beamVolume">-- m³</span>
+          </div>
+          <div class="summary-item">
+            <span>钢筋 Acier longitudinal:</span>
+            <span id="beamSteelLong">-- kg</span>
+          </div>
+          <div class="summary-item">
+            <span>🔲 Cadres:</span>
+            <span id="beamSteelFrames">-- kg</span>
+          </div>
+          <div class="summary-item">
+            <span>💰 Coût total:</span>
+            <span id="beamCost">-- XOF</span>
+          </div>
+        </div>
+        <div class="btn-group">
+          <button class="btn-prev" onclick="prevScreen(6)">⬅️ Précédent</button>
+          <button class="btn-next" onclick="nextScreen(6)">Suivant ➡️</button>
+        </div>
+      </section>
+
+      <!-- Écran 7 : Mur (briques/parpaings) -->
+      <section id="screen7" class="screen">
+        <h2>🧱 Mur (briques/parpaings)</h2>
+        <div class="form-group">
+          <label for="brickThickness">📏 Épaisseur du mur (m)</label>
+          <input type="text" id="brickThickness" value="0.2" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label for="brickType">🏷️ Type de brique</label>
+          <select id="brickType">
+            <option value="15x20x40">Brique 15x20x40</option>
+            <option value="20x20x40">Brique pleine 20x20x40</option>
+            <option value="20x20x50">Bloc creux 20x20x50</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="mortarThickness">📐 Épaisseur joints (mm)</label>
+          <input type="text" id="mortarThickness" value="10" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label for="renderThickness">📐 Épaisseur enduit (mm)</label>
+          <input type="text" id="renderThickness" value="15" inputmode="decimal">
+        </div>
+        <div class="summary-box">
+          <div class="summary-title">📊 Résultats</div>
+          <div class="summary-item">
+            <span>㎥ Volume maçonnerie:</span>
+            <span id="brickVolume">-- m³</span>
+          </div>
+          <div class="summary-item">
+            <span>🧱 Nombre de briques:</span>
+            <span id="brickCount">-- unités</span>
+          </div>
+          <div class="summary-item">
+            <span>💧 Mortier:</span>
+            <span id="mortarVolume">-- m³</span>
+          </div>
+          <div class="summary-item">
+            <span>🎨 Enduit:</span>
+            <span id="renderVolume">-- m³</span>
+          </div>
+          <div class="summary-item">
+            <span>💰 Coût total:</span>
+            <span id="brickCost">-- XOF</span>
+          </div>
+        </div>
+        <div class="btn-group">
+          <button class="btn-prev" onclick="prevScreen(7)">⬅️ Précédent</button>
+          <button class="btn-next" onclick="nextScreen(7)">Suivant ➡️</button>
+        </div>
+      </section>
+
+      <!-- Écran 8 : Récapitulatif -->
+      <section id="screen8" class="screen">
+        <h2>📋 Récapitulatif & Devis</h2>
+        <div class="summary-box">
+          <div class="summary-title">💰 Coûts totaux</div>
+          <div class="summary-item">
+            <span>🧱 Matériaux:</span>
+            <span id="totalMaterials">-- XOF</span>
+          </div>
+          <div class="summary-item">
+            <span>👷 Main d'œuvre:</span>
+            <span id="labourCost">-- XOF</span>
+          </div>
+          <div class="summary-item">
+            <span>💰 Total général:</span>
+            <span id="grandTotal">-- XOF</span>
+          </div>
+        </div>
+        <div style="overflow-x: auto;">
+          <table id="summaryTable">
+            <thead>
+              <tr>
+                <th>Élément</th>
+                <th>Volume (m³)</th>
+                <th>Ciment (kg)</th>
+                <th>Sacs</th>
+                <th>Gravier (m³)</th>
+                <th>Sable (m³)</th>
+                <th>Acier (kg)</th>
+                <th>Coût (XOF)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Dynamically filled -->
+            </tbody>
+          </table>
+        </div>
+        <div class="actions">
+          <button class="action-btn" onclick="prevScreen(8)">⬅️ Modifier</button>
+          <button class="action-btn" onclick="exportPDF()">📄 Exporter PDF</button>
+          <button class="action-btn" onclick="exportJSON()">💾 Télécharger JSON</button>
+          <button class="action-btn" onclick="exportCSV()">📊 Exporter CSV</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="notification" id="notification"></div>
+
+  <script>
+    // Global state
+    let currentScreen = 1;
+    const totalScreens = 8;
+    let projectData = {
+      metadata: {
+        date: new Date().toISOString(),
+        client: "Client Exemple",
+        parcelle: {}
+      },
+      items: [],
+      total: {
+        materials: 0,
+        labour: 0,
+        grand_total: 0
+      }
+    };
+
+    // Initialize stepper
+    function initStepper() {
+      const stepper = document.getElementById('stepper');
+      stepper.innerHTML = '';
+      for (let i = 1; i <= totalScreens; i++) {
+        const step = document.createElement('div');
+        step.className = 'step';
+        step.textContent = `Étape ${i}`;
+        step.onclick = () => goToScreen(i);
+        stepper.appendChild(step);
+      }
+      updateStepper();
+    }
+
+    function updateStepper() {
+      const steps = document.querySelectorAll('.step');
+      steps.forEach((step, index) => {
+        step.classList.remove('active', 'completed');
+        if (index + 1 === currentScreen) {
+          step.classList.add('active');
+        } else if (index + 1 < currentScreen) {
+          step.classList.add('completed');
+        }
+      });
+    }
+
+    function goToScreen(screen) {
+      if (screen <= currentScreen) {
+        document.getElementById(`screen${currentScreen}`).classList.remove('active');
+        currentScreen = screen;
+        document.getElementById(`screen${currentScreen}`).classList.add('active');
+        updateStepper();
+      }
+    }
+
+    function nextScreen(screen) {
+      if (validateScreen(screen)) {
+        document.getElementById(`screen${screen}`).classList.remove('active');
+        currentScreen++;
+        document.getElementById(`screen${currentScreen}`).classList.add('active');
+        updateStepper();
+        if (currentScreen === 2) calculateScreen1();
+        if (currentScreen === 3) calculateScreen2();
+        if (currentScreen === 4) calculateScreen3();
+        if (currentScreen === 5) calculateScreen4();
+        if (currentScreen === 6) calculateScreen5();
+        if (currentScreen === 7) calculateScreen6();
+        if (currentScreen === 8) calculateScreen7();
+      }
+    }
+
+    function prevScreen(screen) {
+      document.getElementById(`screen${screen}`).classList.remove('active');
+      currentScreen--;
+      document.getElementById(`screen${currentScreen}`).classList.add('active');
+      updateStepper();
+    }
+
+    function validateScreen(screen) {
+      let valid = true;
+      let error = "";
+      if (screen === 1) {
+        const length = parseFloat(document.getElementById('length').value.replace(',', '.'));
+        const width = parseFloat(document.getElementById('width').value.replace(',', '.'));
+        const perimeter = parseFloat(document.getElementById('perimeter').value.replace(',', '.'));
+        if ((isNaN(length) || isNaN(width)) && isNaN(perimeter)) {
+          error = "Veuillez entrer soit le périmètre, soit la longueur et la largeur.";
+          valid = false;
+        }
+      }
+      if (!valid) {
+        showNotification(error, 'error');
+      }
+      return valid;
+    }
+
+    function showNotification(message, type = 'success') {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.className = `notification ${type} show`;
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 3000);
+    }
+
+    function calculateScreen1() {
+      const length = parseFloat(document.getElementById('length').value.replace(',', '.'));
+      const width = parseFloat(document.getElementById('width').value.replace(',', '.'));
+      let perimeter = parseFloat(document.getElementById('perimeter').value.replace(',', '.'));
+      const wallWidth = parseFloat(document.getElementById('wallWidth').value.replace(',', '.'));
+      const wallHeight = parseFloat(document.getElementById('wallHeight').value.replace(',', '.'));
+
+      if (!isNaN(length) && !isNaN(width)) {
+        perimeter = 2 * (length + width);
+        document.getElementById('perimeter').value = perimeter.toFixed(2);
+      }
+
+      const area = length && width ? length * width : 0;
+
+      document.getElementById('displayPerimeter').textContent = perimeter ? perimeter.toFixed(2) + ' m' : '-- m';
+      document.getElementById('displayArea').textContent = area ? area.toFixed(2) + ' m²' : '-- m²';
+
+      projectData.metadata.parcelle = {
+        perimetre: perimeter || 0,
+        surface: area || 0,
+        L: length || 0,
+        W: width || 0
+      };
+    }
+
+    function calculateScreen2() {
+      const perimeter = projectData.metadata.parcelle.perimetre || 0;
+      const width = parseFloat(document.getElementById('cleaningWidth').value.replace(',', '.'));
+      const thickness = parseFloat(document.getElementById('cleaningThickness').value.replace(',', '.'));
+      const dosage = parseFloat(document.getElementById('cementDosage').value.replace(',', '.'));
+      const cementPrice = parseFloat(document.getElementById('cementPrice').value.replace(',', '.'));
+      const gravelPrice = parseFloat(document.getElementById('gravelPrice').value.replace(',', '.'));
+      const sandPrice = parseFloat(document.getElementById('sandPrice').value.replace(',', '.'));
+
+      const volume = perimeter * width * thickness;
+      const cementKg = volume * dosage;
+      const sacks = Math.ceil(cementKg / 50);
+      const gravelVol = volume * 0.8;
+      const sandVol = volume * 0.45;
+
+      const cost = sacks * cementPrice + gravelVol * gravelPrice + sandVol * sandPrice;
+
+      document.getElementById('cleaningVolume').textContent = volume.toFixed(2) + ' m³';
+      document.getElementById('cleaningCement').textContent = cementKg.toFixed(2) + ' kg';
+      document.getElementById('cleaningSacks').textContent = sacks + ' sacs';
+      document.getElementById('cleaningCost').textContent = cost.toFixed(2) + ' XOF';
+
+      projectData.items[0] = {
+        name: "Béton de propreté",
+        volume_m3: volume,
+        cement_kg: cementKg,
+        sacks: sacks,
+        gravel_m3: gravelVol,
+        sand_m3: sandVol,
+        costs: {
+          cement: sacks * cementPrice,
+          gravel: gravelVol * gravelPrice,
+          sand: sandVol * sandPrice
+        }
+      };
+    }
+
+    function calculateScreen3() {
+      const perimeter = projectData.metadata.parcelle.perimetre || 0;
+      const width = parseFloat(document.getElementById('footingWidth').value.replace(',', '.'));
+      const height = parseFloat(document.getElementById('footingHeight').value.replace(',', '.'));
+      const dosage = parseFloat(document.getElementById('footingCementDosage').value.replace(',', '.'));
+      const rebarDiamLong = parseFloat(document.getElementById('rebarDiameterLong').value.replace(',', '.'));
+      const rebarCountLong = parseFloat(document.getElementById('rebarCountLong').value.replace(',', '.'));
+      const rebarDiamTrans = parseFloat(document.getElementById('rebarDiameterTrans').value.replace(',', '.'));
+      const rebarSpacingTrans = parseFloat(document.getElementById('rebarSpacingTrans').value.replace(',', '.')) / 1000;
+      const steelPrice = parseFloat(document.getElementById('steelPrice').value.replace(',', '.'));
+
+      const volume = perimeter * width * height;
+      const cementKg = volume * dosage;
+      const sacks = Math.ceil(cementKg / 50);
+      const gravelVol = volume * 0.8;
+      const sandVol = volume * 0.45;
+
+      // Steel calculations
+      const steelLongLength = perimeter * rebarCountLong;
+      const steelLongMass = steelLongLength * 0.006165177 * rebarDiamLong * rebarDiamLong;
+
+      const transCount = Math.ceil(perimeter / rebarSpacingTrans);
+      const transLength = (2 * width + 2 * height) + 2 * 0.1; // Adding hooks
+      const steelTransMass = transCount * transLength * 0.006165177 * rebarDiamTrans * rebarDiamTrans;
+
+      const totalSteelMass = steelLongMass + steelTransMass;
+      const steelCost = totalSteelMass * steelPrice;
+
+      const cost = sacks * 70000 + gravelVol * 20000 + sandVol * 4000 + steelCost;
+
+      document.getElementById('footingVolume').textContent = volume.toFixed(2) + ' m³';
+      document.getElementById('footingSteelLong').textContent = steelLongMass.toFixed(2) + ' kg';
+      document.getElementById('footingSteelTrans').textContent = steelTransMass.toFixed(2) + ' kg';
+      document.getElementById('footingCost').textContent = cost.toFixed(2) + ' XOF';
+
+      projectData.items[1] = {
+        name: "Semelle filante",
+        volume_m3: volume,
+        cement_kg: cementKg,
+        sacks: sacks,
+        gravel_m3: gravelVol,
+        sand_m3: sandVol,
+        steel_kg: totalSteelMass,
+        costs: {
+          cement: sacks * 70000,
+          gravel: gravelVol * 20000,
+          sand: sandVol * 4000,
+          steel: steelCost
+        }
+      };
+    }
+
+    function calculateScreen4() {
+      const postWidth = parseFloat(document.getElementById('postWidth').value.replace(',', '.'));
+      const postLength = parseFloat(document.getElementById('postLength').value.replace(',', '.'));
+      const postHeight = parseFloat(document.getElementById('postHeight').value.replace(',', '.'));
+      const postCount = parseFloat(document.getElementById('postCount').value.replace(',', '.'));
+      const dosage = parseFloat(document.getElementById('postCementDosage').value.replace(',', '.'));
+      const rebarCount = parseFloat(document.getElementById('postRebarCount').value.replace(',', '.'));
+      const rebarDiameter = parseFloat(document.getElementById('postRebarDiameter').value.replace(',', '.'));
+      const frameSpacing = parseFloat(document.getElementById('postFrameSpacing').value.replace(',', '.'));
+
+      const volume = postWidth * postLength * postHeight * postCount;
+      const cementKg = volume * dosage;
+      const sacks = Math.ceil(cementKg / 50);
+      const gravelVol = volume * 0.8;
+      const sandVol = volume * 0.45;
+
+      // Steel calculations
+      const steelLongLength = postHeight * rebarCount * postCount;
+      const steelLongMass = steelLongLength * 0.006165177 * rebarDiameter * rebarDiameter;
+
+      const frameCount = Math.floor(postHeight / frameSpacing) * postCount;
+      const frameLength = 2 * (postWidth + postLength) + 0.2; // Adding hooks
+      const steelFrameMass = frameCount * frameLength * 0.006165177 * 8 * 8;
+
+      const totalSteelMass = steelLongMass + steelFrameMass;
+      const steelCost = totalSteelMass * 450;
+
+      const cost = sacks * 70000 + gravelVol * 20000 + sandVol * 4000 + steelCost;
+
+      document.getElementById('postVolume').textContent = volume.toFixed(2) + ' m³';
+      document.getElementById('postSteelLong').textContent = steelLongMass.toFixed(2) + ' kg';
+      document.getElementById('postSteelFrames').textContent = steelFrameMass.toFixed(2) + ' kg';
+      document.getElementById('postCost').textContent = cost.toFixed(2) + ' XOF';
+
+      projectData.items[2] = {
+        name: "Poteaux amorces",
+        volume_m3: volume,
+        cement_kg: cementKg,
+        sacks: sacks,
+        gravel_m3: gravelVol,
+        sand_m3: sandVol,
+        steel_kg: totalSteelMass,
+        costs: {
+          cement: sacks * 70000,
+          gravel: gravelVol * 20000,
+          sand: sandVol * 4000,
+          steel: steelCost
+        }
+      };
+    }
+
+    function calculateScreen5() {
+      const postHeight = parseFloat(document.getElementById('elevPostHeight').value.replace(',', '.'));
+      const postCount = projectData.items[2] ? projectData.items[2].volume_m3 / (0.3 * 0.3 * 0.5) : 10;
+      const rebarCount = parseFloat(document.getElementById('elevPostRebarCount').value.replace(',', '.'));
+      const rebarDiameter = parseFloat(document.getElementById('elevPostRebarDiameter').value.replace(',', '.'));
+      const frameSpacing = parseFloat(document.getElementById('elevPostFrameSpacing').value.replace(',', '.'));
+
+      const postWidth = 0.3;
+      const postLength = 0.3;
+      const volume = postWidth * postLength * postHeight * postCount;
+      const cementKg = volume * 350;
+      const sacks = Math.ceil(cementKg / 50);
+      const gravelVol = volume * 0.8;
+      const sandVol = volume * 0.45;
+
+      // Steel calculations
+      const steelLongLength = postHeight * rebarCount * postCount;
+      const steelLongMass = steelLongLength * 0.006165177 * rebarDiameter * rebarDiameter;
+
+      const frameCount = Math.floor(postHeight / frameSpacing) * postCount;
+      const frameLength = 2 * (postWidth + postLength) + 0.2;
+      const steelFrameMass = frameCount * frameLength * 0.006165177 * 8 * 8;
+
+      const totalSteelMass = steelLongMass + steelFrameMass;
+      const steelCost = totalSteelMass * 450;
+
+      const cost = sacks * 70000 + gravelVol * 20000 + sandVol * 4000 + steelCost;
+
+      document.getElementById('elevPostVolume').textContent = volume.toFixed(2) + ' m³';
+      document.getElementById('elevPostSteelLong').textContent = steelLongMass.toFixed(2) + ' kg';
+      document.getElementById('elevPostSteelFrames').textContent = steelFrameMass.toFixed(2) + ' kg';
+      document.getElementById('elevPostCost').textContent = cost.toFixed(2) + ' XOF';
+
+      projectData.items[3] = {
+        name: "Poteaux en élévation",
+        volume_m3: volume,
+        cement_kg: cementKg,
+        sacks: sacks,
+        gravel_m3: gravelVol,
+        sand_m3: sandVol,
+        steel_kg: totalSteelMass,
+        costs: {
+          cement: sacks * 70000,
+          gravel: gravelVol * 20000,
+          sand: sandVol * 4000,
+          steel: steelCost
+        }
+      };
+    }
+
+    function calculateScreen6() {
+      const perimeter = projectData.metadata.parcelle.perimetre || 0;
+      const beamWidth = parseFloat(document.getElementById('beamWidth').value.replace(',', '.'));
+      const beamHeight = parseFloat(document.getElementById('beamHeight').value.replace(',', '.'));
+      const rebarDiameter = parseFloat(document.getElementById('beamRebarDiameter').value.replace(',', '.'));
+      const rebarCount = parseFloat(document.getElementById('beamRebarCount').value.replace(',', '.'));
+      const rebarSpacing = parseFloat(document.getElementById('beamRebarSpacing').value.replace(',', '.')) / 1000;
+
+      const volume = perimeter * beamWidth * beamHeight * 2; // Bas + Couronnement
+      const cementKg = volume * 350;
+      const sacks = Math.ceil(cementKg / 50);
+      const gravelVol = volume * 0.8;
+      const sandVol = volume * 0.45;
+
+      // Steel calculations
+      const steelLongLength = perimeter * rebarCount * 2;
+      const steelLongMass = steelLongLength * 0.006165177 * rebarDiameter * rebarDiameter;
+
+      const frameCount = Math.ceil(perimeter / rebarSpacing) * 2;
+      const frameLength = (beamWidth + beamHeight) * 2 + 0.2;
+      const steelFrameMass = frameCount * frameLength * 0.006165177 * 8 * 8;
+
+      const totalSteelMass = steelLongMass + steelFrameMass;
+      const steelCost = totalSteelMass * 450;
+
+      const cost = sacks * 70000 + gravelVol * 20000 + sandVol * 4000 + steelCost;
+
+      document.getElementById('beamVolume').textContent = volume.toFixed(2) + ' m³';
+      document.getElementById('beamSteelLong').textContent = steelLongMass.toFixed(2) + ' kg';
+      document.getElementById('beamSteelFrames').textContent = steelFrameMass.toFixed(2) + ' kg';
+      document.getElementById('beamCost').textContent = cost.toFixed(2) + ' XOF';
+
+      projectData.items[4] = {
+        name: "Chaînage bas & Couronnement",
+        volume_m3: volume,
+        cement_kg: cementKg,
+        sacks: sacks,
+        gravel_m3: gravelVol,
+        sand_m3: sandVol,
+        steel_kg: totalSteelMass,
+        costs: {
+          cement: sacks * 70000,
+          gravel: gravelVol * 20000,
+          sand: sandVol * 4000,
+          steel: steelCost
+        }
+      };
+    }
+
+    function calculateScreen7() {
+      const perimeter = projectData.metadata.parcelle.perimetre || 0;
+      const height = projectData.metadata.parcelle.W ? projectData.metadata.parcelle.W : 2;
+      const thickness = parseFloat(document.getElementById('brickThickness').value.replace(',', '.'));
+      const brickType = document.getElementById('brickType').value;
+      const mortarThickness = parseFloat(document.getElementById('mortarThickness').value.replace(',', '.')) / 1000;
+      const renderThickness = parseFloat(document.getElementById('renderThickness').value.replace(',', '.')) / 1000;
+
+      let brickDims = [0.15, 0.2, 0.4]; // Default
+      if (brickType === "20x20x40") brickDims = [0.2, 0.2, 0.4];
+      if (brickType === "20x20x50") brickDims = [0.2, 0.2, 0.5];
+
+      const brickVol = (brickDims[0] + mortarThickness) * (brickDims[1] + mortarThickness) * (brickDims[2] + mortarThickness);
+      const wallVol = perimeter * height * thickness;
+      const brickCount = Math.ceil(wallVol / brickVol);
+
+      const mortarVol = wallVol * 0.15; // Approx
+      const renderVol = perimeter * height * 2 * renderThickness; // Both sides
+
+      const cost = brickCount * 100 + mortarVol * 5000 + renderVol * 6000;
+
+      document.getElementById('brickVolume').textContent = wallVol.toFixed(2) + ' m³';
+      document.getElementById('brickCount').textContent = brickCount + ' unités';
+      document.getElementById('mortarVolume').textContent = mortarVol.toFixed(2) + ' m³';
+      document.getElementById('renderVolume').textContent = renderVol.toFixed(2) + ' m³';
+      document.getElementById('brickCost').textContent = cost.toFixed(2) + ' XOF';
+
+      projectData.items[5] = {
+        name: "Mur (briques/parpaings)",
+        volume_m3: wallVol,
+        brick_count: brickCount,
+        mortar_m3: mortarVol,
+        render_m3: renderVol,
+        costs: {
+          bricks: brickCount * 100,
+          mortar: mortarVol * 5000,
+          render: renderVol * 6000
+        }
+      };
+
+      calculateSummary();
+    }
+
+    function calculateSummary() {
+      let totalMaterials = 0;
+      let totalLabour = 0;
+      let grandTotal = 0;
+
+      projectData.items.forEach(item => {
+        if (item.costs) {
+          Object.values(item.costs).forEach(val => totalMaterials += val);
+        }
+      });
+
+      totalLabour = totalMaterials * 0.3; // 30% main d'œuvre
+      grandTotal = totalMaterials + totalLabour;
+
+      projectData.total.materials = totalMaterials;
+      projectData.total.labour = totalLabour;
+      projectData.total.grand_total = grandTotal;
+
+      document.getElementById('totalMaterials').textContent = totalMaterials.toFixed(2) + ' XOF';
+      document.getElementById('labourCost').textContent = totalLabour.toFixed(2) + ' XOF';
+      document.getElementById('grandTotal').textContent = grandTotal.toFixed(2) + ' XOF';
+
+      const tbody = document.getElementById('summaryTable').querySelector('tbody');
+      tbody.innerHTML = '';
+      projectData.items.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${item.name}</td>
+          <td>${item.volume_m3 ? item.volume_m3.toFixed(2) : ''}</td>
+          <td>${item.cement_kg ? item.cement_kg.toFixed(2) : ''}</td>
+          <td>${item.sacks || ''}</td>
+          <td>${item.gravel_m3 ? item.gravel_m3.toFixed(2) : ''}</td>
+          <td>${item.sand_m3 ? item.sand_m3.toFixed(2) : ''}</td>
+          <td>${item.steel_kg ? item.steel_kg.toFixed(2) : ''}</td>
+          <td>${Object.values(item.costs || {}).reduce((a,b) => a+b, 0).toFixed(2)}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function exportPDF() {
+      showNotification("Export PDF simulé. Dans une vraie application, cela utiliserait jsPDF + html2canvas.", 'success');
+    }
+
+    function exportJSON() {
+      const dataStr = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(projectData, null, 2));
+      const downloadAnchorNode = document.createElement('a');
+      downloadAnchorNode.setAttribute("href", dataStr);
+      downloadAnchorNode.setAttribute("download", "devis_mur.json");
+      document.body.appendChild(downloadAnchorNode);
+      downloadAnchorNode.click();
+      downloadAnchorNode.remove();
+      showNotification("Fichier JSON téléchargé avec succès!", 'success');
+    }
+
+    function exportCSV() {
+      let csv = 'Élément,Volume (m³),Ciment (kg),Sacs,Gravier (m³),Sable (m³),Acier (kg),Coût (XOF)\n';
+      projectData.items.forEach(item => {
+        csv += `"${item.name}",${item.volume_m3 || ''},${item.cement_kg || ''},${item.sacks || ''},${item.gravel_m3 || ''},${item.sand_m3 || ''},${item.steel_kg || ''},${Object.values(item.costs || {}).reduce((a,b) => a+b, 0)}\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", "devis_mur.csv");
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showNotification("Fichier CSV téléchargé avec succès!", 'success');
+    }
+
+    // Initialize
+    window.onload = function() {
+      initStepper();
+    };
+  </script>
+</body>
+</html>
+```
