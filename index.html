@@ -1,1637 +1,2419 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>🏗️ Calcul Mur Clôture</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur de Clôture</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --accent-color: #e74c3c;
+            --success-color: #2ecc71;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --card-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
 
-    :root {
-      --primary: #3498db;
-      --primary-dark: #2980b9;
-      --secondary: #2ecc71;
-      --danger: #e74c3c;
-      --warning: #f39c12;
-      --light: #f8f9fa;
-      --dark: #2c3e50;
-      --gray: #7f8c8d;
-      --border: #e1e8ed;
-      --card-bg: #ffffff;
-      --text-primary: #2c3e50;
-      --text-secondary: #7f8c8d;
-      --shadow: 0 4px 12px rgba(0,0,0,0.08);
-      --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
-      --radius: 12px;
-      --radius-sm: 8px;
-      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-    body {
-      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: var(--text-primary);
-      line-height: 1.6;
-      min-height: 100vh;
-      padding: 16px;
-      font-size: 16px;
-    }
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--dark-color);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
 
-    .app-container {
-      max-width: 500px;
-      margin: 0 auto;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 15px;
+        }
 
-    /* Header */
-    .app-header {
-      text-align: center;
-      padding: 24px 16px;
-      color: white;
-      flex-shrink: 0;
-    }
+        header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+        }
 
-    .app-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 8px;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(45deg);
+        }
 
-    .app-subtitle {
-      font-size: 0.9rem;
-      opacity: 0.9;
-      font-weight: 400;
-    }
+        header h1 {
+            margin-bottom: 10px;
+            font-size: 2rem;
+            position: relative;
+            z-index: 1;
+        }
 
-    /* Stepper */
-    .stepper {
-      display: flex;
-      background: rgba(255,255,255,0.15);
-      backdrop-filter: blur(10px);
-      border-radius: 30px;
-      padding: 4px;
-      margin: 0 16px 24px;
-      flex-shrink: 0;
-    }
+        header p {
+            position: relative;
+            z-index: 1;
+            opacity: 0.9;
+        }
 
-    .step {
-      flex: 1;
-      padding: 12px 4px;
-      text-align: center;
-      font-size: 0.7rem;
-      font-weight: 600;
-      color: rgba(255,255,255,0.7);
-      border-radius: 24px;
-      cursor: pointer;
-      transition: var(--transition);
-      user-select: none;
-    }
+        .progress-container {
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            height: 10px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
 
-    .step.active {
-      background: white;
-      color: var(--primary);
-      transform: scale(1.05);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
+        .progress-bar {
+            background: linear-gradient(90deg, var(--success-color) 0%, var(--primary-color) 100%);
+            height: 100%;
+            width: 10%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
 
-    .step.completed {
-      background: var(--secondary);
-      color: white;
-    }
+        .screen {
+            display: none;
+            background-color: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 20px;
+            animation: fadeIn 0.5s ease;
+        }
 
-    /* Screen */
-    .screen {
-      background: var(--card-bg);
-      border-radius: var(--radius);
-      padding: 24px;
-      margin-bottom: 20px;
-      box-shadow: var(--shadow);
-      flex: 1;
-      display: none;
-      flex-direction: column;
-      animation: slideIn 0.4s ease;
-    }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-    @keyframes slideIn {
-      from { 
-        opacity: 0; 
-        transform: translateY(20px); 
-      }
-      to { 
-        opacity: 1; 
-        transform: translateY(0); 
-      }
-    }
+        .screen.active {
+            display: block;
+        }
 
-    .screen.active {
-      display: flex;
-    }
+        .screen-title {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+        }
 
-    .screen-header {
-      text-align: center;
-      margin-bottom: 24px;
-    }
+        .screen-title i {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-    .screen-title {
-      font-size: 1.3rem;
-      font-weight: 600;
-      color: var(--primary);
-      margin-bottom: 8px;
-    }
+        .form-group {
+            margin-bottom: 20px;
+        }
 
-    .screen-subtitle {
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-    }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-color);
+            font-size: 0.95rem;
+        }
 
-    /* Form */
-    .form-group {
-      margin-bottom: 20px;
-    }
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background-color: #f9f9f9;
+        }
 
-    .form-label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 500;
-      font-size: 0.95rem;
-      color: var(--text-primary);
-    }
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            background-color: white;
+        }
 
-    .form-input, .form-select {
-      width: 100%;
-      padding: 14px 16px;
-      border: 2px solid var(--border);
-      border-radius: var(--radius-sm);
-      font-size: 1rem;
-      font-family: inherit;
-      background: white;
-      transition: var(--transition);
-      appearance: none;
-    }
+        .btn {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
 
-    .form-input:focus, .form-select:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-    }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+        }
 
-    .input-group {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
 
-    .input-group .form-group {
-      flex: 1;
-      margin-bottom: 0;
-    }
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color) 0%, #27ae60 100%);
+            color: white;
+        }
 
-    /* Summary Box */
-    .summary-box {
-      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-      border-radius: var(--radius-sm);
-      padding: 20px;
-      margin: 20px 0;
-      border-left: 4px solid var(--primary);
-    }
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
 
-    .summary-title {
-      font-weight: 600;
-      color: var(--primary);
-      margin-bottom: 16px;
-      font-size: 1.1rem;
-    }
+        .btn-secondary {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+            color: white;
+        }
 
-    .summary-item {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 12px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid rgba(0,0,0,0.05);
-    }
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
 
-    .summary-item:last-child {
-      border-bottom: none;
-      margin-bottom: 0;
-      padding-bottom: 0;
-      font-weight: 700;
-      font-size: 1.1rem;
-      color: var(--primary-dark);
-    }
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+            gap: 15px;
+        }
 
-    /* Buttons */
-    .button-group {
-      display: flex;
-      gap: 12px;
-      margin-top: auto;
-    }
+        .result-container {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
 
-    .btn {
-      flex: 1;
-      padding: 16px;
-      border: none;
-      border-radius: var(--radius-sm);
-      font-size: 1rem;
-      font-weight: 600;
-      font-family: inherit;
-      cursor: pointer;
-      transition: var(--transition);
-      text-align: center;
-      min-height: 50px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
 
-    .btn:active {
-      transform: scale(0.98);
-    }
+        .result-item:last-child {
+            border-bottom: none;
+        }
 
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-    }
+        .result-label {
+            font-weight: 600;
+            color: #555;
+        }
 
-    .btn-primary:hover {
-      background: var(--primary-dark);
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-lg);
-    }
+        .result-value {
+            color: var(--primary-color);
+            font-weight: 700;
+        }
 
-    .btn-secondary {
-      background: var(--secondary);
-      color: white;
-    }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
 
-    .btn-secondary:hover {
-      background: #27ae60;
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-lg);
-    }
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
 
-    .btn-outline {
-      background: transparent;
-      border: 2px solid var(--primary);
-      color: var(--primary);
-    }
+        th {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            font-weight: 600;
+        }
 
-    .btn-outline:hover {
-      background: var(--primary);
-      color: white;
-      transform: translateY(-2px);
-    }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
 
-    .btn-icon {
-      font-size: 1.2rem;
-    }
+        tr:hover {
+            background-color: #e9f7fe;
+        }
 
-    /* Table */
-    .table-container {
-      overflow-x: auto;
-      margin: 20px 0;
-      border-radius: var(--radius-sm);
-      box-shadow: var(--shadow);
-    }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, var(--success-color) 0%, #27ae60 100%);
+            color: white;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-      font-size: 0.85rem;
-    }
+        .notification.show {
+            transform: translateX(0);
+        }
 
-    th, td {
-      padding: 12px;
-      text-align: left;
-      border-bottom: 1px solid var(--border);
-    }
+        .icon-input {
+            position: relative;
+        }
 
-    th {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-      color: white;
-      font-weight: 600;
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
+        .icon-input i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #95a5a6;
+        }
 
-    tr:last-child td {
-      border-bottom: none;
-    }
+        .icon-input input {
+            padding-left: 45px;
+        }
 
-    tr:hover {
-      background-color: #f8f9fa;
-    }
+        .summary-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s ease;
+        }
 
-    /* Actions */
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 24px;
-    }
+        .summary-card:hover {
+            transform: translateY(-5px);
+        }
 
-    .action-btn {
-      flex: 1;
-      min-width: 120px;
-      padding: 14px;
-      border-radius: var(--radius-sm);
-      font-weight: 500;
-      font-size: 0.9rem;
-      transition: var(--transition);
-      border: 2px solid var(--primary);
-      background: white;
-      color: var(--primary);
-      text-align: center;
-    }
+        .summary-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-    .action-btn:hover {
-      background: var(--primary);
-      color: white;
-      transform: translateY(-2px);
-      box-shadow: var(--shadow);
-    }
+        .summary-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin: 10px 0;
+        }
 
-    /* Notification */
-    .notification {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%) translateY(-100px);
-      padding: 16px 24px;
-      border-radius: var(--radius-sm);
-      color: white;
-      font-weight: 500;
-      font-size: 0.9rem;
-      box-shadow: var(--shadow-lg);
-      z-index: 1000;
-      transition: transform 0.3s ease;
-      max-width: 90%;
-      text-align: center;
-    }
+        .summary-card .unit {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
 
-    .notification.show {
-      transform: translateX(-50%) translateY(0);
-    }
+        .mobile-table {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
 
-    .notification.success {
-      background: var(--secondary);
-    }
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .screen {
+                padding: 15px;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .screen-title {
+                font-size: 1.3rem;
+            }
+            
+            .screen-title i {
+                font-size: 1.5rem;
+            }
+            
+            table {
+                font-size: 0.9rem;
+            }
+            
+            th, td {
+                padding: 10px;
+            }
+            
+            .summary-card {
+                padding: 15px;
+            }
+            
+            .summary-card .value {
+                font-size: 1.8rem;
+            }
+        }
 
-    .notification.error {
-      background: var(--danger);
-    }
+        /* Nouveaux styles pour les informations supplémentaires */
+        .additional-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
 
-    /* OR divider */
-    .or-divider {
-      text-align: center;
-      margin: 16px 0;
-      position: relative;
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-    }
+        .info-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
 
-    .or-divider::before {
-      content: "";
-      position: absolute;
-      top: 50%;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: var(--border);
-      z-index: 1;
-    }
+        .info-card:hover {
+            transform: translateY(-3px);
+        }
 
-    .or-divider span {
-      position: relative;
-      background: white;
-      padding: 0 16px;
-      z-index: 2;
-    }
+        .info-card .icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
 
-    /* Responsive */
-    @media (max-width: 480px) {
-      body {
-        padding: 12px;
-        font-size: 15px;
-      }
-      
-      .app-title {
-        font-size: 1.3rem;
-      }
-      
-      .app-subtitle {
-        font-size: 0.8rem;
-      }
-      
-      .screen {
-        padding: 20px;
-      }
-      
-      .screen-title {
-        font-size: 1.2rem;
-      }
-      
-      .step {
-        font-size: 0.6rem;
-        padding: 10px 2px;
-      }
-      
-      .input-group {
-        flex-direction: column;
-        gap: 12px;
-      }
-      
-      .btn {
-        padding: 14px;
-        font-size: 0.95rem;
-      }
-      
-      table {
-        font-size: 0.75rem;
-      }
-      
-      th, td {
-        padding: 8px;
-      }
-    }
+        .info-card .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+        }
 
-    @media (max-width: 360px) {
-      body {
-        padding: 8px;
-      }
-      
-      .app-header {
-        padding: 16px 12px;
-      }
-      
-      .screen {
-        padding: 16px;
-      }
-      
-      .form-input, .form-select {
-        padding: 12px;
-        font-size: 0.95rem;
-      }
-      
-      .btn {
-        padding: 12px;
-        font-size: 0.9rem;
-      }
-    }
-
-    /* Dark mode support */
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --card-bg: #1a1a1a;
-        --text-primary: #ffffff;
-        --text-secondary: #b0b0b0;
-        --border: #333333;
-      }
-      
-      body {
-        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-      }
-      
-      .summary-box {
-        background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
-      }
-      
-      .form-input, .form-select {
-        background: #2c2c2c;
-        color: white;
-        border-color: #404040;
-      }
-      
-      table {
-        background: #2c2c2c;
-        color: white;
-      }
-      
-      tr:hover {
-        background-color: #3a3a3a;
-      }
-    }
-
-    /* Loading spinner */
-    .spinner {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 2px solid rgba(255,255,255,.3);
-      border-radius: 50%;
-      border-top-color: white;
-      animation: spin 1s ease-in-out infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* Progress bar */
-    .progress-bar {
-      height: 4px;
-      background: rgba(255,255,255,0.2);
-      border-radius: 2px;
-      margin: 16px 0;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: var(--secondary);
-      border-radius: 2px;
-      transition: width 0.3s ease;
-    }
-  </style>
+        .info-card .label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
 <body>
-  <div class="app-container">
-    <header class="app-header">
-      <h1 class="app-title">🏗️ Calcul Mur Clôture</h1>
-      <p class="app-subtitle">Calculez les quantités et coûts pour votre projet</p>
-    </header>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-calculator"></i> Calculateur de Clôture</h1>
+            <p>Estimez précisément les matériaux pour votre projet de clôture</p>
+        </header>
 
-    <div class="stepper" id="stepper">
-      <!-- Dynamically filled -->
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <!-- Écran d'introduction -->
+        <div class="screen active" id="screen-intro">
+            <h2 class="screen-title"><i class="fas fa-info-circle"></i> Introduction</h2>
+            <p>Bienvenue dans l'application de calcul de clôture. Cette application vous aidera à estimer les quantités de matériaux nécessaires pour la construction de votre clôture.</p>
+            <p>Pour commencer, veuillez entrer le périmètre de votre parcelle :</p>
+            
+            <div class="form-group">
+                <label for="perimeter">Périmètre de la parcelle (m)</label>
+                <div class="icon-input">
+                    <i class="fas fa-ruler-combined"></i>
+                    <input type="number" id="perimeter" placeholder="Ex: 80" min="1">
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <div></div>
+                <button class="btn btn-primary" onclick="nextScreen()">
+                    <i class="fas fa-arrow-right"></i> Commencer
+                </button>
+            </div>
+        </div>
+
+        <!-- Écran Béton de propreté -->
+        <div class="screen" id="screen-beton-proprete">
+            <h2 class="screen-title"><i class="fas fa-cubes"></i> Béton de propreté</h2>
+            
+            <div class="form-group">
+                <label for="largeur-fouille-beton">Largeur de la fouille (m)</label>
+                <div class="icon-input">
+                    <i class="fas fa-ruler-horizontal"></i>
+                    <input type="number" id="largeur-fouille-beton" placeholder="Ex: 0.3" step="0.01" min="0.01">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="epaisseur-beton">Épaisseur du béton (m)</label>
+                <div class="icon-input">
+                    <i class="fas fa-ruler-vertical"></i>
+                    <input type="number" id="epaisseur-beton" placeholder="Ex: 0.05" step="0.01" min="0.01">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="dosage-beton">Dosage (kg/m³)</label>
+                <div class="icon-input">
+                    <i class="fas fa-balance-scale"></i>
+                    <select id="dosage-beton">
+                        <option value="150">150 kg/m³</option>
+                        <option value="200">200 kg/m³</option>
+                        <option value="250">250 kg/m³</option>
+                        <option value="300">300 kg/m³</option>
+                        <option value="350">350 kg/m³</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="result-container" id="result-beton-proprete">
+                <div class="result-item">
+                    <span class="result-label">Volume de béton:</span>
+                    <span class="result-value" id="volume-beton-proprete">0 m³</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Quantité de ciment:</span>
+                    <span class="result-value" id="ciment-beton-proprete">0 kg</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Volume de gravier:</span>
+                    <span class="result-value" id="gravier-beton-proprete">0 m³</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Volume de sable:</span>
+                    <span class="result-value" id="sable-beton-proprete">0 m³</span>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="prevScreen()">
+                    <i class="fas fa-arrow-left"></i> Précédent
+                </button>
+                <button class="btn btn-primary" onclick="nextScreen()">
+                    <i class="fas fa-arrow-right"></i> Suivant
+                </button>
+            </div>
+        </div>
+
+        <!-- Écran Semelle filante -->
+        <div class="screen" id="screen-semelle">
+            <h2 class="screen-title"><i class="fas fa-grip-lines"></i> Semelle filante</h2>
+            
+            <div class="form-group">
+                <label for="largeur-fouille-semelle">Largeur de la fouille (m)</label>
+                <div class="icon-input">
+                    <i class="fas fa-ruler-horizontal"></i>
+                    <input type="number" id="largeur-fouille-semelle" placeholder="Ex: 0.4" step="0.01" min="0.01">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="epaisseur-semelle">Épaisseur du béton (m)</label>
+                <div class="icon-input">
+                    <i class="fas fa-ruler-vertical"></i>
+                    <input type="number" id="epaisseur-semelle" placeholder="Ex: 0.2" step="0.01" min="0.01">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="dosage-semelle">Dosage (kg/m³)</label>
+                <div class="icon-input">
+                    <i class="fas fa-balance-scale"></i>
+                    <select id="dosage-semelle">
+                        <option value="150">150 kg/m³</option>
+                        <option value="200">200 kg/m³</option>
+                        <option value="250">250 kg/m³</option>
+                        <option value="300">300 kg/m³</option>
+                        <option value="350">350 kg/m³</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="diametre-longitudinal">Diamètre des barres longitudinales (mm)</label>
+                <div class="icon-input">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                    <select id="diametre-longitudinal">
+                        <option value="6">6 mm</option>
+                        <option value="8">8 mm</option>
+                        <option value="10">10 mm</option>
+                        <option value="12">12 mm</option>
+                        <option value="14">14 mm</option>
+                        <option value="16">16 mm</option>
+                        <option value="20">20 mm</option>
+                        <option value="25">25 mm</option>
+                        <option value="32">32 mm</option>
+                        <option value="40">40 mm</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="nombre-barres-longitudinal">Nombre de barres longitudinales</label>
+                <div class="icon-input">
+                    <i class="fas fa-sort-numeric-up"></i>
+                    <input type="number" id="nombre-barres-longitudinal" placeholder="Ex: 4" min="1">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="diametre-transversal">Diamètre des barres transversales (mm)</label>
+                <div class="icon-input">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                    <select id="diametre-transversal">
+                        <option value="6">6 mm</option>
+                        <option value="8">8 mm</option>
+                        <option value="10">10 mm</option>
+                        <option value="12">12 mm</option>
+                        <option value="14">14 mm</option>
+                        <option value="16">16 mm</option>
+                        <option value="20">20 mm</option>
+                        <option value="25">25 mm</option>
+                        <option value="32">32 mm</option>
+                        <option value="40">40 mm</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="espacement-transversal">Espacement des barres transversales (m)</label>
+                <div class="icon-input">
+                    <i class="fas fa-ruler"></i>
+                    <input type="number" id="espacement-transversal" placeholder="Ex: 0.2" step="0.01" min="0.01">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="longueur-transversal">Longueur d'une barre transversale (m)</label>
+                <div class="icon-input">
+                    <i class="fas fa-ruler-horizontal"></i>
+                    <input type="number" id="longueur-transversal" placeholder="Ex: 0.35" step="0.01" min="0.01">
+                </div>
+            </div>
+            
+            <div class="result-container" id="result-semelle">
+                <div class="result-item">
+                    <span class="result-label">Volume de béton:</span>
+                    <span class="result-value" id="volume-semelle">0 m³</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Quantité de ciment:</span>
+                    <span class="result-value" id="ciment-semelle">0 kg</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Volume de gravier:</span>
+                    <span class="result-value" id="gravier-semelle">0 m³</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Volume de sable:</span>
+                    <span class="result-value" id="sable-semelle">0 m³</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Poids d'acier longitudinal:</span>
+                    <span class="result-value" id="acier-longitudinal-semelle">0 kg</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Poids d'acier transversal:</span>
+                    <span class="result-value" id="acier-transversal-semelle">0 kg</span>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="prevScreen()">
+                    <i class="fas fa-arrow-left"></i> Précédent
+                </button>
+                <button class="btn btn-primary" onclick="nextScreen()">
+                    <i class="fas fa-arrow-right"></i> Suivant
+                </button>
+            </div>
+        </div>
+
+        <!-- Écran Poteaux amorces -->
+        <div class="screen" id="screen-poteaux-amorces">
+            <h2 class="screen-title"><i class="fas fa-columns"></i> Poteaux amorces</h2>
+            
+            <div class="form-group">
+                <label for="longueur-poteau-amorce">Longueur du poteau (m)</label>
+                <div class="icon-input">
+                    <i class="fas fa-ruler-vertical"></i>
+                    <input type="number" id="longueur-poteau-amorce" placeholder="Ex: 0.5" step="0.01" min="0.01">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="largeur-poteau-amorce">Largeur du poteau (m)</label>
+                <div class="icon-input">
+                    <i class="fas fa-ruler-horizontal"></i>
+                    <input type="number" id="largeur-poteau-amorce" placeholder="Ex: 0.2" step="0.01" min="0.01">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="hauteur-poteau-amorce">Hauteur du poteau (m)</label>
+                <div class="icon-input">
+                    <i class="fas fa-arrows-alt-v"></i>
+                    <input type="number" id="hauteur-poteau-amorce" placeholder="Ex: 0.5" step="0.01" min="0.01">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="nombre-poteaux-amorces">Nombre total de poteaux</label>
+                <div class="icon-input">
+                    <i class="fas fa-sort-numeric-up"></i>
+                    <input type="number" id="nombre-poteaux-amorces" placeholder="Ex: 10" min="1">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="dosage-poteau-amorce">Dosage (kg/m³)</label>
+                <div class="icon-input">
+                    <i class="fas fa-balance-scale"></i>
+                    <select id="dosage-poteau-amorce">
+                        <option value="150">150 kg/m³</option>
+                        <option value="200">200 kg/m³</option>
+                        <option value="250">250 kg/m³</option>
+                        <option value="300">300 kg/m³</option>
+                        <option value="350">350 kg/m³</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="nombre-barres-longitudinal-poteau-amorce">Nombre de barres longitudinales</label>
+                <div class="icon-input">
+                    <i class="fas fa-sort-numeric-up"></i>
+                    <input type="number" id="nombre-barres-longitudinal-poteau-amorce" placeholder="Ex: 4" min="1">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="diametre-barre-longitudinal-poteau-amorce">Diamètre des barres longitudinales (mm)</label>
+                <div class="icon-input">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                    <select id="diametre-barre-longitudinal-poteau-amorce">
+                        <option value="6">6 mm</option>
+                        <option value="8">8 mm</option>
+                        <option value="10">10 mm</option>
+                        <option value="12">12 mm</option>
+                        <option value="14">14 mm</option>
+                        <option value="16">16 mm</option>
+                        <option value="20">20 mm</option>
+                        <option value="25">25 mm</option>
+                        <option value="32">32 mm</option>
+                        <option value="40">40 mm</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="diametre-barre-transversal-poteau-amorce">Diamètre des barres transversales (mm)</label>
+                <div class="icon-input">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                    <select id="diametre-barre-transversal-poteau-amorce">
+                        <option value="6">6 mm</option>
+                        <option value="8">8 mm</option>
+                        <option value="10">10 mm</option>
+                        <option value="12">12 mm</option>
+                        <option value="14">14 mm</option>
+                        <option value="16">16 mm</option>
+                        <option value="20">20 mm</option>
+                        <option value="25">25 mm</option>
+                        <option value="32">32 mm</option>
+                        <option value="40">40 mm</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="espacement-cadres-poteau-amorce">Espacement des cadres (m)</label>
+                <div class="icon-input">
+                    <i class="fas fa-ruler"></i>
+                    <input type="number" id="espacement-cadres-poteau-amorce" placeholder="Ex: 0.15" step="0.01" min="0.01">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="longueur-cadre-poteau-amorce">Longueur développée d'un cadre (m)</label>
+                <div class="icon-input">
+                    <i class="fas fa-ruler-combined"></i>
+                    <input type="number" id="longueur-cadre-poteau-amorce" placeholder="Ex: 0.8" step="0.01" min="0.01">
+                </div>
+            </div>
+            
+            <div class="result-container" id="result-poteaux-amorces">
+                <div class="result-item">
+                    <span class="result-label">Volume de béton:</span>
+                    <span class="result-value" id="volume-poteaux-amorces">0 m³</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Quantité de ciment:</span>
+                    <span class="result-value" id="ciment-poteaux-amorces">0 kg</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Volume de gravier:</span>
+                    <span class="result-value" id="gravier-poteaux-amorces">0 m³</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Volume de sable:</span>
+                    <span class="result-value" id="sable-poteaux-amorces">0 m³</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Poids d'acier longitudinal:</span>
+                    <span class="result-value" id="acier-longitudinal-poteaux-amorces">0 kg</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Poids d'acier transversal:</span>
+                    <span class="result-value" id="acier-transversal-poteaux-amorces">0 kg</span>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="prevScreen()">
+                    <i class="fas fa-arrow-left"></i> Précédent
+                </button>
+                <button class="btn btn-primary" onclick="nextScreen()">
+                    <i class="fas fa-arrow-right"></i> Suivant
+                </button>
+            </div>
+        </div>
+
+        <!-- Écran Poteau en élévation -->
+        <div class="screen" id="screen-poteau-elevation">
+            <h2 class="screen-title"><i class="fas fa-building"></i> Poteau en élévation</h2>
+            
+            <div class="form-group">
+                <label for="longueur-poteau-elevation">Longueur du poteau (m)</label>
+                <div class="icon-input">
+                    <i class="fas fa-ruler-vertical"></i>
+                    <input type="number" id="longueur-poteau-elevation" placeholder="Ex: 0.2" step="0.01" min="0.01">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="largeur-poteau-elevation">Largeur du poteau (m)</label>
+                <div class="icon-input">
+                    <i class="fas fa-ruler-horizontal"></i>
+                    <input type="number" id="largeur-poteau-elevation" placeholder="Ex: 0.2" step="0.01" min="0.01">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="hauteur-poteau-elevation">Hauteur du poteau (m)</label>
+                <div class="icon-input">
+                    <i class="fas fa-arrows-alt-v"></i>
+                    <input type="number" id="hauteur-poteau-elevation" placeholder="Ex: 1.8" step="0.01" min="0.01">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="nombre-poteaux-elevation">Nombre total de poteaux</label>
+                <div class="icon-input">
+                    <i class="fas fa-sort-numeric-up"></i>
+                    <input type="number" id="nombre-poteaux-elevation" placeholder="Ex: 10" min="1">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="dosage-poteau-elevation">Dosage (kg/m³)</label>
+                <div class="icon-input">
+                    <i class="fas fa-balance-scale"></i>
+                    <select id="dosage-poteau-elevation">
+                        <option value="150">150 kg/m³</option>
+                        <option value="200">200 kg/m³</option>
+                        <option value="250">250 kg/m³</option>
+                        <option value="300">300 kg/m³</option>
+                        <option value="350">350 kg/m³</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="nombre-barres-longitudinal-poteau-elevation">Nombre de barres longitudinales</label>
+                <div class="icon-input">
+                    <i class="fas fa-sort-numeric-up"></i>
+                    <input type="number" id="nombre-barres-longitudinal-poteau-elevation" placeholder="Ex: 4" min="1">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="diametre-barre-longitudinal-poteau-elevation">Diamètre des barres longitudinales (mm)</label>
+                <div class="icon-input">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                    <select id="diametre-barre-longitudinal-poteau-elevation">
+                        <option value="6">6 mm</option>
+                        <option value="8">8 mm</option>
+                        <option value="10">10 mm</option>
+                        <option value="12">12 mm</option>
+                        <option value="14">14 mm</option>
+                        <option value="16">16 mm</option>
+                        <option value="20">20 mm</option>
+                        <option value="25">25 mm</option>
+                        <option value="32">32 mm</option>
+                        <option value="40">40 mm</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="diametre-barre-transversal-poteau-elevation">Diamètre des barres transversales (mm)</label>
+                <div class="icon-input">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                    <select id="diametre-barre-transversal-poteau-elevation">
+                        <option value="6">6 mm</option>
+                        <option value="8">8 mm</option>
+                        <option value="10">10 mm</option>
+                        <option value="12">12 mm</option>
+                        <option value="14">14 mm</option>
+                        <option value="16">16 mm</option>
+                        <option value="20">20 mm</option>
+                        <option value="25">25 mm</option>
+                        <option value="32">32 mm</option>
+                        <option value="40">40 mm</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="espacement-cadres-poteau-elevation">Espacement des cadres (m)</label>
+                <div class="icon-input">
+                    <i class="fas fa-ruler"></i>
+                    <input type="number" id="espacement-cadres-poteau-elevation" placeholder="Ex: 0.15" step="0.01" min="0.01">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="longueur-cadre-poteau-elevation">Longueur développée d'un cadre (m)</label>
+                <div class="icon-input">
+                    <i class="fas fa-ruler-combined"></i>
+                    <input type="number" id="longueur-cadre-poteau-elevation" placeholder="Ex: 0.8" step="0.01" min="0.01">
+                </div>
+            </div>
+            
+            <div class="result-container" id="result-poteau-elevation">
+                <div class="result-item">
+                    <span class="result-label">Volume de béton:</span>
+                    <span class="result-value" id="volume-poteau-elevation">0 m³</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Quantité de ciment:</span>
+                    <span class="result-value" id="ciment-poteau-elevation">0 kg</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Volume de gravier:</span>
+                    <span class="result-value" id="gravier-poteau-elevation">0 m³</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Volume de sable:</span>
+                    <span class="result-value" id="sable-poteau-elevation">0 m³</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Poids d'acier longitudinal:</span>
+                    <span class="result-value" id="acier-longitudinal-poteau-elevation">0 kg</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Poids d'acier transversal:</span>
+                    <span class="result-value" id="acier-transversal-poteau-elevation">0 kg</span>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="prevScreen()">
+                    <i class="fas fa-arrow-left"></i> Précédent
+                </button>
+                <button class="btn btn-primary" onclick="nextScreen()">
+                    <i class="fas fa-arrow-right"></i> Suivant
+                </button>
+            </div>
+        </div>
+
+        <!-- Écran Chainage de couronnement -->
+        <div class="screen" id="screen-chainage-couronnement">
+            <h2 class="screen-title"><i class="fas fa-border-top"></i> Chainage de couronnement</h2>
+            
+            <div class="form-group">
+                <label for="largeur-chainage-couronnement">Largeur du chainage (m)</label>
+                <div class="icon-input">
+                    <i class="fas fa-ruler-horizontal"></i>
+                    <input type="number" id="largeur-chainage-couronnement" placeholder="Ex: 0.2" step="0.01" min="0.01">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="hauteur-chainage-couronnement">Hauteur du chainage (m)</label>
+                <div class="icon-input">
+                    <i class="fas fa-ruler-vertical"></i>
+                    <input type="number" id="hauteur-chainage-couronnement" placeholder="Ex: 0.2" step="0.01" min="0.01">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="dosage-chainage-couronnement">Dosage (kg/m³)</label>
+                <div class="icon-input">
+                    <i class="fas fa-balance-scale"></i>
+                    <select id="dosage-chainage-couronnement">
+                        <option value="150">150 kg/m³</option>
+                        <option value="200">200 kg/m³</option>
+                        <option value="250">250 kg/m³</option>
+                        <option value="300">300 kg/m³</option>
+                        <option value="350">350 kg/m³</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="diametre-longitudinal-chainage-couronnement">Diamètre des barres longitudinales (mm)</label>
+                <div class="icon-input">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                    <select id="diametre-longitudinal-chainage-couronnement">
+                        <option value="6">6 mm</option>
+                        <option value="8">8 mm</option>
+                        <option value="10">10 mm</option>
+                        <option value="12">12 mm</option>
+                        <option value="14">14 mm</option>
+                        <option value="16">16 mm</option>
+                        <option value="20">20 mm</option>
+                        <option value="25">25 mm</option>
+                        <option value="32">32 mm</option>
+                        <option value="40">40 mm</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="nombre-barres-longitudinal-chainage-couronnement">Nombre de barres longitudinales</label>
+                <div class="icon-input">
+                    <i class="fas fa-sort-numeric-up"></i>
+                    <input type="number" id="nombre-barres-longitudinal-chainage-couronnement" placeholder="Ex: 4" min="1">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="diametre-transversal-chainage-couronnement">Diamètre des barres transversales (mm)</label>
+                <div class="icon-input">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                    <select id="diametre-transversal-chainage-couronnement">
+                        <option value="6">6 mm</option>
+                        <option value="8">8 mm</option>
+                        <option value="10">10 mm</option>
+                        <option value="12">12 mm</option>
+                        <option value="14">14 mm</option>
+                        <option value="16">16 mm</option>
+                        <option value="20">20 mm</option>
+                        <option value="25">25 mm</option>
+                        <option value="32">32 mm</option>
+                        <option value="40">40 mm</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="espacement-transversal-chainage-couronnement">Espacement des barres transversales (m)</label>
+                <div class="icon-input">
+                    <i class="fas fa-ruler"></i>
+                    <input type="number" id="espacement-transversal-chainage-couronnement" placeholder="Ex: 0.2" step="0.01" min="0.01">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="longueur-transversal-chainage-couronnement">Longueur d'une barre transversale (m)</label>
+                <div class="icon-input">
+                    <i class="fas fa-ruler-horizontal"></i>
+                    <input type="number" id="longueur-transversal-chainage-couronnement" placeholder="Ex: 0.15" step="0.01" min="0.01">
+                </div>
+            </div>
+            
+            <div class="result-container" id="result-chainage-couronnement">
+                <div class="result-item">
+                    <span class="result-label">Volume de béton:</span>
+                    <span class="result-value" id="volume-chainage-couronnement">0 m³</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Quantité de ciment:</span>
+                    <span class="result-value" id="ciment-chainage-couronnement">0 kg</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Volume de gravier:</span>
+                    <span class="result-value" id="gravier-chainage-couronnement">0 m³</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Volume de sable:</span>
+                    <span class="result-value" id="sable-chainage-couronnement">0 m³</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Poids d'acier longitudinal:</span>
+                    <span class="result-value" id="acier-longitudinal-chainage-couronnement">0 kg</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Poids d'acier transversal:</span>
+                    <span class="result-value" id="acier-transversal-chainage-couronnement">0 kg</span>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="prevScreen()">
+                    <i class="fas fa-arrow-left"></i> Précédent
+                </button>
+                <button class="btn btn-primary" onclick="nextScreen()">
+                    <i class="fas fa-arrow-right"></i> Suivant
+                </button>
+            </div>
+        </div>
+
+        <!-- Écran Chainage bas -->
+        <div class="screen" id="screen-chainage-bas">
+            <h2 class="screen-title"><i class="fas fa-border-bottom"></i> Chainage bas</h2>
+            
+            <div class="form-group">
+                <label for="largeur-chainage-bas">Largeur du chainage (m)</label>
+                <div class="icon-input">
+                    <i class="fas fa-ruler-horizontal"></i>
+                    <input type="number" id="largeur-chainage-bas" placeholder="Ex: 0.2" step="0.01" min="0.01">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="hauteur-chainage-bas">Hauteur du chainage (m)</label>
+                <div class="icon-input">
+                    <i class="fas fa-ruler-vertical"></i>
+                    <input type="number" id="hauteur-chainage-bas" placeholder="Ex: 0.2" step="0.01" min="0.01">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="dosage-chainage-bas">Dosage (kg/m³)</label>
+                <div class="icon-input">
+                    <i class="fas fa-balance-scale"></i>
+                    <select id="dosage-chainage-bas">
+                        <option value="150">150 kg/m³</option>
+                        <option value="200">200 kg/m³</option>
+                        <option value="250">250 kg/m³</option>
+                        <option value="300">300 kg/m³</option>
+                        <option value="350">350 kg/m³</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="diametre-longitudinal-chainage-bas">Diamètre des barres longitudinales (mm)</label>
+                <div class="icon-input">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                    <select id="diametre-longitudinal-chainage-bas">
+                        <option value="6">6 mm</option>
+                        <option value="8">8 mm</option>
+                        <option value="10">10 mm</option>
+                        <option value="12">12 mm</option>
+                        <option value="14">14 mm</option>
+                        <option value="16">16 mm</option>
+                        <option value="20">20 mm</option>
+                        <option value="25">25 mm</option>
+                        <option value="32">32 mm</option>
+                        <option value="40">40 mm</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="nombre-barres-longitudinal-chainage-bas">Nombre de barres longitudinales</label>
+                <div class="icon-input">
+                    <i class="fas fa-sort-numeric-up"></i>
+                    <input type="number" id="nombre-barres-longitudinal-chainage-bas" placeholder="Ex: 4" min="1">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="diametre-transversal-chainage-bas">Diamètre des barres transversales (mm)</label>
+                <div class="icon-input">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                    <select id="diametre-transversal-chainage-bas">
+                        <option value="6">6 mm</option>
+                        <option value="8">8 mm</option>
+                        <option value="10">10 mm</option>
+                        <option value="12">12 mm</option>
+                        <option value="14">14 mm</option>
+                        <option value="16">16 mm</option>
+                        <option value="20">20 mm</option>
+                        <option value="25">25 mm</option>
+                        <option value="32">32 mm</option>
+                        <option value="40">40 mm</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="espacement-transversal-chainage-bas">Espacement des barres transversales (m)</label>
+                <div class="icon-input">
+                    <i class="fas fa-ruler"></i>
+                    <input type="number" id="espacement-transversal-chainage-bas" placeholder="Ex: 0.2" step="0.01" min="0.01">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="longueur-transversal-chainage-bas">Longueur d'une barre transversale (m)</label>
+                <div class="icon-input">
+                    <i class="fas fa-ruler-horizontal"></i>
+                    <input type="number" id="longueur-transversal-chainage-bas" placeholder="Ex: 0.15" step="0.01" min="0.01">
+                </div>
+            </div>
+            
+            <div class="result-container" id="result-chainage-bas">
+                <div class="result-item">
+                    <span class="result-label">Volume de béton:</span>
+                    <span class="result-value" id="volume-chainage-bas">0 m³</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Quantité de ciment:</span>
+                    <span class="result-value" id="ciment-chainage-bas">0 kg</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Volume de gravier:</span>
+                    <span class="result-value" id="gravier-chainage-bas">0 m³</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Volume de sable:</span>
+                    <span class="result-value" id="sable-chainage-bas">0 m³</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Poids d'acier longitudinal:</span>
+                    <span class="result-value" id="acier-longitudinal-chainage-bas">0 kg</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Poids d'acier transversal:</span>
+                    <span class="result-value" id="acier-transversal-chainage-bas">0 kg</span>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="prevScreen()">
+                    <i class="fas fa-arrow-left"></i> Précédent
+                </button>
+                <button class="btn btn-primary" onclick="nextScreen()">
+                    <i class="fas fa-arrow-right"></i> Suivant
+                </button>
+            </div>
+        </div>
+
+        <!-- Écran Brique plein de 20x20x40 -->
+        <div class="screen" id="screen-brique-plein">
+            <h2 class="screen-title"><i class="fas fa-th"></i> Brique plein de 20x20x40</h2>
+            
+            <div class="form-group">
+                <label for="hauteur-mur-soubassement">Hauteur du mur de soubassement (m)</label>
+                <div class="icon-input">
+                    <i class="fas fa-ruler-vertical"></i>
+                    <input type="number" id="hauteur-mur-soubassement" placeholder="Ex: 0.6" step="0.01" min="0.01">
+                </div>
+            </div>
+            
+            <div class="result-container" id="result-brique-plein">
+                <div class="result-item">
+                    <span class="result-label">Surface du mur:</span>
+                    <span class="result-value" id="surface-brique-plein">0 m²</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Nombre de briques:</span>
+                    <span class="result-value" id="nombre-briques-plein">0</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Masse de ciment:</span>
+                    <span class="result-value" id="ciment-brique-plein">0 kg</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Volume de sable:</span>
+                    <span class="result-value" id="sable-brique-plein">0 m³</span>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="prevScreen()">
+                    <i class="fas fa-arrow-left"></i> Précédent
+                </button>
+                <button class="btn btn-primary" onclick="nextScreen()">
+                    <i class="fas fa-arrow-right"></i> Suivant
+                </button>
+            </div>
+        </div>
+
+        <!-- Écran Brique creuse de 15x20x40 -->
+        <div class="screen" id="screen-brique-creuse">
+            <h2 class="screen-title"><i class="fas fa-th-large"></i> Brique creuse de 15x20x40</h2>
+            
+            <div class="form-group">
+                <label for="hauteur-mur-brique-creuse">Hauteur du mur (m)</label>
+                <div class="icon-input">
+                    <i class="fas fa-ruler-vertical"></i>
+                    <input type="number" id="hauteur-mur-brique-creuse" placeholder="Ex: 1.8" step="0.01" min="0.01">
+                </div>
+            </div>
+            
+            <div class="result-container" id="result-brique-creuse">
+                <div class="result-item">
+                    <span class="result-label">Surface du mur:</span>
+                    <span class="result-value" id="surface-brique-creuse">0 m²</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Nombre de briques:</span>
+                    <span class="result-value" id="nombre-briques-creuse">0</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Masse de ciment:</span>
+                    <span class="result-value" id="ciment-brique-creuse">0 kg</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Volume de sable:</span>
+                    <span class="result-value" id="sable-brique-creuse">0 m³</span>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="prevScreen()">
+                    <i class="fas fa-arrow-left"></i> Précédent
+                </button>
+                <button class="btn btn-primary" onclick="nextScreen()">
+                    <i class="fas fa-arrow-right"></i> Suivant
+                </button>
+            </div>
+        </div>
+
+        <!-- Écran Joint et enduit -->
+        <div class="screen" id="screen-joint-enduit">
+            <h2 class="screen-title"><i class="fas fa-paint-roller"></i> Joint et enduit</h2>
+            
+            <div class="form-group">
+                <label for="epaisseur-enduit">Épaisseur de l'enduit (cm)</label>
+                <div class="icon-input">
+                    <i class="fas fa-ruler-vertical"></i>
+                    <input type="number" id="epaisseur-enduit" placeholder="Ex: 1.5" step="0.1" min="0.1">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="dosage-enduit">Dosage (kg/m³)</label>
+                <div class="icon-input">
+                    <i class="fas fa-balance-scale"></i>
+                    <select id="dosage-enduit">
+                        <option value="150">150 kg/m³</option>
+                        <option value="200">200 kg/m³</option>
+                        <option value="250">250 kg/m³</option>
+                        <option value="300">300 kg/m³</option>
+                        <option value="350">350 kg/m³</option>
+                        <option value="400">400 kg/m³</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="result-container" id="result-joint-enduit">
+                <div class="result-item">
+                    <span class="result-label">Volume de l'enduit:</span>
+                    <span class="result-value" id="volume-enduit">0 m³</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Masse de ciment:</span>
+                    <span class="result-value" id="ciment-enduit">0 kg</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Volume de sable:</span>
+                    <span class="result-value" id="sable-enduit">0 m³</span>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="prevScreen()">
+                    <i class="fas fa-arrow-left"></i> Précédent
+                </button>
+                <button class="btn btn-success" onclick="showResults()">
+                    <i class="fas fa-calculator"></i> Calculer les résultats
+                </button>
+            </div>
+        </div>
+
+        <!-- Écran Résultats -->
+        <div class="screen" id="screen-results">
+            <h2 class="screen-title"><i class="fas fa-chart-bar"></i> Récapitulatif des matériaux</h2>
+            
+            <h3>Quantités par élément</h3>
+            <div class="mobile-table">
+                <table id="table-par-element">
+                    <thead>
+                        <tr>
+                            <th>Élément</th>
+                            <th>Ciment (kg)</th>
+                            <th>Sacs (50kg)</th>
+                            <th>Tonnes</th>
+                            <th>Sable (m³)</th>
+                            <th>Gravier (m³)</th>
+                            <th>Acier (kg)</th>
+                            <th>Paquets (100kg)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Les résultats seront insérés ici par JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <h3 style="margin-top: 30px;">Quantités totales</h3>
+            <div class="additional-info">
+                <div class="info-card">
+                    <div class="icon"><i class="fas fa-cubes"></i></div>
+                    <div class="value" id="ciment-total-value">0</div>
+                    <div class="label">Ciment (kg)</div>
+                </div>
+                <div class="info-card">
+                    <div class="icon"><i class="fas fa-box"></i></div>
+                    <div class="value" id="sacs-total-value">0</div>
+                    <div class="label">Sacs (50kg)</div>
+                </div>
+                <div class="info-card">
+                    <div class="icon"><i class="fas fa-weight-hanging"></i></div>
+                    <div class="value" id="tonnes-total-value">0</div>
+                    <div class="label">Tonnes</div>
+                </div>
+                <div class="info-card">
+                    <div class="icon"><i class="fas fa-mountain"></i></div>
+                    <div class="value" id="sable-total-value">0</div>
+                    <div class="label">Sable (m³)</div>
+                </div>
+                <div class="info-card">
+                    <div class="icon"><i class="fas fa-gem"></i></div>
+                    <div class="value" id="gravier-total-value">0</div>
+                    <div class="label">Gravier (m³)</div>
+                </div>
+                <div class="info-card">
+                    <div class="icon"><i class="fas fa-dumbbell"></i></div>
+                    <div class="value" id="acier-total-value">0</div>
+                    <div class="label">Acier (kg)</div>
+                </div>
+                <div class="info-card">
+                    <div class="icon"><i class="fas fa-box-open"></i></div>
+                    <div class="value" id="paquets-total-value">0</div>
+                    <div class="label">Paquets (100kg)</div>
+                </div>
+            </div>
+            
+            <h3 style="margin-top: 30px;">Détail de l'acier par diamètre</h3>
+            <div class="mobile-table">
+                <table id="table-acier-par-diametre">
+                    <thead>
+                        <tr>
+                            <th>Diamètre (mm)</th>
+                            <th>Poids (kg)</th>
+                            <th>Paquets (100kg)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Les résultats seront insérés ici par JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="prevScreen()">
+                    <i class="fas fa-arrow-left"></i> Précédent
+                </button>
+                <button class="btn btn-primary" onclick="resetApp()">
+                    <i class="fas fa-redo"></i> Recommencer
+                </button>
+            </div>
+        </div>
     </div>
 
-    <main class="main-content">
-      <!-- Écran 1 : Paramètres parcelle -->
-      <section id="screen1" class="screen active">
-        <div class="screen-header">
-          <h2 class="screen-title">📏 Dimensions Parcelle</h2>
-          <p class="screen-subtitle">Entrez les dimensions de votre terrain</p>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">🏷️ Type de parcelle (optionnel)</label>
-          <input type="text" class="form-input" id="parcelType" placeholder="Ex: Résidentielle, Agricole...">
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">📐 Dimensions Terrain</label>
-          <div class="input-group">
-            <div class="form-group">
-              <input type="text" class="form-input" id="length" placeholder="Longueur (m)" inputmode="decimal">
-            </div>
-            <div class="form-group">
-              <input type="text" class="form-input" id="width" placeholder="Largeur (m)" inputmode="decimal">
-            </div>
-          </div>
-          
-          <div class="or-divider">
-            <span>OU</span>
-          </div>
-          
-          <div class="form-group">
-            <input type="text" class="form-input" id="perimeter" placeholder="Périmètre total (m)" inputmode="decimal">
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">📏 Dimensions Mur</label>
-          <div class="input-group">
-            <div class="form-group">
-              <input type="text" class="form-input" id="wallWidth" value="0.2" inputmode="decimal">
-              <small>Largeur (m)</small>
-            </div>
-            <div class="form-group">
-              <input type="text" class="form-input" id="wallHeight" value="2.0" inputmode="decimal">
-              <small>Hauteur (m)</small>
-            </div>
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">💱 Devise</label>
-          <select class="form-select" id="currency">
-            <option value="XOF">XOF (Franc CFA)</option>
-            <option value="EUR">EUR (Euro)</option>
-            <option value="USD">USD (Dollar US)</option>
-          </select>
-        </div>
-        
-        <div class="summary-box">
-          <h3 class="summary-title">📊 Calculs automatiques</h3>
-          <div class="summary-item">
-            <span>📏 Périmètre:</span>
-            <span id="displayPerimeter">-- m</span>
-          </div>
-          <div class="summary-item">
-            <span>📐 Surface:</span>
-            <span id="displayArea">-- m²</span>
-          </div>
-        </div>
-        
-        <div class="button-group">
-          <button class="btn btn-primary" onclick="nextScreen(1)">
-            <span class="btn-icon">🚀</span>
-            Commencer
-          </button>
-        </div>
-      </section>
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notification-message"></span>
+    </div>
 
-      <!-- Écran 2 : Béton de propreté -->
-      <section id="screen2" class="screen">
-        <div class="screen-header">
-          <h2 class="screen-title">🧹 Béton de propreté</h2>
-          <p class="screen-subtitle">Calcul des fondations</p>
-        </div>
+    <script>
+        // Variables globales
+        let currentScreen = 0;
+        const screens = document.querySelectorAll('.screen');
+        const progressBar = document.getElementById('progress-bar');
         
-        <div class="form-group">
-          <label class="form-label">📏 Largeur de la fouille (m)</label>
-          <input type="text" class="form-input" id="cleaningWidth" value="0.6" inputmode="decimal">
-        </div>
+        // Stockage des résultats
+        let results = {
+            betonProprete: {
+                ciment: 0,
+                sable: 0,
+                gravier: 0,
+                acier: {}
+            },
+            semelle: {
+                ciment: 0,
+                sable: 0,
+                gravier: 0,
+                acier: {}
+            },
+            poteauxAmorces: {
+                ciment: 0,
+                sable: 0,
+                gravier: 0,
+                acier: {}
+            },
+            poteauElevation: {
+                ciment: 0,
+                sable: 0,
+                gravier: 0,
+                acier: {}
+            },
+            chainageCouronnement: {
+                ciment: 0,
+                sable: 0,
+                gravier: 0,
+                acier: {}
+            },
+            chainageBas: {
+                ciment: 0,
+                sable: 0,
+                gravier: 0,
+                acier: {}
+            },
+            briquePlein: {
+                ciment: 0,
+                sable: 0
+            },
+            briqueCreuse: {
+                ciment: 0,
+                sable: 0
+            },
+            jointEnduit: {
+                ciment: 0,
+                sable: 0
+            }
+        };
         
-        <div class="form-group">
-          <label class="form-label">📐 Épaisseur (m)</label>
-          <input type="text" class="form-input" id="cleaningThickness" value="0.1" inputmode="decimal">
-        </div>
+        // Poids linéaire de l'acier en kg/m
+        const acierPoidsLineaire = {
+            6: 0.222,
+            8: 0.395,
+            10: 0.617,
+            12: 0.888,
+            14: 1.208,
+            16: 1.578,
+            20: 2.466,
+            25: 3.853,
+            32: 6.313,
+            40: 9.864
+        };
         
-        <div class="form-group">
-          <label class="form-label">🧱 Dosage ciment (kg/m³)</label>
-          <input type="text" class="form-input" id="cementDosage" value="350" inputmode="decimal">
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">💰 Prix unitaires</label>
-          <div class="input-group">
-            <div class="form-group">
-              <input type="text" class="form-input" id="cementPrice" placeholder="Ciment/sac" value="70000" inputmode="decimal">
-              <small>Ciment (XOF)</small>
-            </div>
-            <div class="form-group">
-              <input type="text" class="form-input" id="gravelPrice" placeholder="Gravier/m³" value="20000" inputmode="decimal">
-              <small>Gravier (XOF)</small>
-            </div>
-          </div>
-          <div class="form-group">
-            <input type="text" class="form-input" id="sandPrice" placeholder="Sable (XOF/m³)" value="4000" inputmode="decimal">
-          </div>
-        </div>
-        
-        <div class="summary-box">
-          <h3 class="summary-title">📊 Résultats</h3>
-          <div class="summary-item">
-            <span>㎥ Volume béton:</span>
-            <span id="cleaningVolume">-- m³</span>
-          </div>
-          <div class="summary-item">
-            <span>🧱 Ciment:</span>
-            <span id="cleaningCement">-- kg</span>
-          </div>
-          <div class="summary-item">
-            <span>📦 Sacs de ciment:</span>
-            <span id="cleaningSacks">-- sacs</span>
-          </div>
-          <div class="summary-item">
-            <span>💰 Coût total:</span>
-            <span id="cleaningCost">-- XOF</span>
-          </div>
-        </div>
-        
-        <div class="button-group">
-          <button class="btn btn-outline" onclick="prevScreen(2)">
-            <span class="btn-icon">⬅️</span>
-            Précédent
-          </button>
-          <button class="btn btn-primary" onclick="nextScreen(2)">
-            Suivant
-            <span class="btn-icon">➡️</span>
-          </button>
-        </div>
-      </section>
-
-      <!-- Écran 3 : Semelle filante -->
-      <section id="screen3" class="screen">
-        <div class="screen-header">
-          <h2 class="screen-title">磉 Semelle filante</h2>
-          <p class="screen-subtitle">Fondations continues</p>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">📏 Largeur de la fouille (m)</label>
-          <input type="text" class="form-input" id="footingWidth" value="0.6" inputmode="decimal">
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">📐 Épaisseur (m)</label>
-          <input type="text" class="form-input" id="footingHeight" value="0.3" inputmode="decimal">
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">🧱 Dosage ciment (kg/m³)</label>
-          <input type="text" class="form-input" id="footingCementDosage" value="350" inputmode="decimal">
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">钢筋 Ferraillage</label>
-          <div class="input-group">
-            <div class="form-group">
-              <input type="text" class="form-input" id="rebarDiameterLong" value="12" inputmode="decimal">
-              <small>⌀ Longitudinal (mm)</small>
-            </div>
-            <div class="form-group">
-              <input type="text" class="form-input" id="rebarCountLong" value="4" inputmode="decimal">
-              <small>Nb barres</small>
-            </div>
-          </div>
-          <div class="input-group">
-            <div class="form-group">
-              <input type="text" class="form-input" id="rebarDiameterTrans" value="8" inputmode="decimal">
-              <small>⌀ Étriers (mm)</small>
-            </div>
-            <div class="form-group">
-              <input type="text" class="form-input" id="rebarSpacingTrans" value="200" inputmode="decimal">
-              <small>Espacement (mm)</small>
-            </div>
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">💰 Prix de l'acier (XOF/kg)</label>
-          <input type="text" class="form-input" id="steelPrice" value="450" inputmode="decimal">
-        </div>
-        
-        <div class="summary-box">
-          <h3 class="summary-title">📊 Résultats</h3>
-          <div class="summary-item">
-            <span>㎥ Volume béton:</span>
-            <span id="footingVolume">-- m³</span>
-          </div>
-          <div class="summary-item">
-            <span>钢筋 Acier longitudinal:</span>
-            <span id="footingSteelLong">-- kg</span>
-          </div>
-          <div class="summary-item">
-            <span>⭕ Étriers:</span>
-            <span id="footingSteelTrans">-- kg</span>
-          </div>
-          <div class="summary-item">
-            <span>💰 Coût total:</span>
-            <span id="footingCost">-- XOF</span>
-          </div>
-        </div>
-        
-        <div class="button-group">
-          <button class="btn btn-outline" onclick="prevScreen(3)">
-            <span class="btn-icon">⬅️</span>
-            Précédent
-          </button>
-          <button class="btn btn-primary" onclick="nextScreen(3)">
-            Suivant
-            <span class="btn-icon">➡️</span>
-          </button>
-        </div>
-      </section>
-
-      <!-- Écran 4 : Poteaux amorces -->
-      <section id="screen4" class="screen">
-        <div class="screen-header">
-          <h2 class="screen-title">เสา Poteaux amorces</h2>
-          <p class="screen-subtitle">Fondations des poteaux</p>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">📏 Dimensions poteau (m)</label>
-          <div class="input-group">
-            <div class="form-group">
-              <input type="text" class="form-input" id="postWidth" value="0.3" inputmode="decimal">
-              <small>Largeur</small>
-            </div>
-            <div class="form-group">
-              <input type="text" class="form-input" id="postLength" value="0.3" inputmode="decimal">
-              <small>Longueur</small>
-            </div>
-            <div class="form-group">
-              <input type="text" class="form-input" id="postHeight" value="0.5" inputmode="decimal">
-              <small>Hauteur</small>
-            </div>
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">🔢 Nombre de poteaux</label>
-          <input type="text" class="form-input" id="postCount" value="10" inputmode="decimal">
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">🧱 Dosage ciment (kg/m³)</label>
-          <input type="text" class="form-input" id="postCementDosage" value="350" inputmode="decimal">
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">钢筋 Ferraillage poteau</label>
-          <div class="input-group">
-            <div class="form-group">
-              <input type="text" class="form-input" id="postRebarCount" value="4" inputmode="decimal">
-              <small>Barres/poteau</small>
-            </div>
-            <div class="form-group">
-              <input type="text" class="form-input" id="postRebarDiameter" value="12" inputmode="decimal">
-              <small>⌀ (mm)</small>
-            </div>
-          </div>
-          <div class="form-group">
-            <input type="text" class="form-input" id="postFrameSpacing" value="0.2" inputmode="decimal" placeholder="Espacement cadres (m)">
-          </div>
-        </div>
-        
-        <div class="summary-box">
-          <h3 class="summary-title">📊 Résultats</h3>
-          <div class="summary-item">
-            <span>㎥ Volume béton:</span>
-            <span id="postVolume">-- m³</span>
-          </div>
-          <div class="summary-item">
-            <span>钢筋 Acier longitudinal:</span>
-            <span id="postSteelLong">-- kg</span>
-          </div>
-          <div class="summary-item">
-            <span>🔲 Cadres:</span>
-            <span id="postSteelFrames">-- kg</span>
-          </div>
-          <div class="summary-item">
-            <span>💰 Coût total:</span>
-            <span id="postCost">-- XOF</span>
-          </div>
-        </div>
-        
-        <div class="button-group">
-          <button class="btn btn-outline" onclick="prevScreen(4)">
-            <span class="btn-icon">⬅️</span>
-            Précédent
-          </button>
-          <button class="btn btn-primary" onclick="nextScreen(4)">
-            Suivant
-            <span class="btn-icon">➡️</span>
-          </button>
-        </div>
-      </section>
-
-      <!-- Écran 5 : Poteaux en élévation -->
-      <section id="screen5" class="screen">
-        <div class="screen-header">
-          <h2 class="screen-title">🏗️ Poteaux en élévation</h2>
-          <p class="screen-subtitle">Structure verticale</p>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">📐 Hauteur en élévation (m)</label>
-          <input type="text" class="form-input" id="elevPostHeight" value="2.0" inputmode="decimal">
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">钢筋 Ferraillage</label>
-          <div class="input-group">
-            <div class="form-group">
-              <input type="text" class="form-input" id="elevPostRebarCount" value="4" inputmode="decimal">
-              <small>Barres/poteau</small>
-            </div>
-            <div class="form-group">
-              <input type="text" class="form-input" id="elevPostRebarDiameter" value="12" inputmode="decimal">
-              <small>⌀ (mm)</small>
-            </div>
-          </div>
-          <div class="form-group">
-            <input type="text" class="form-input" id="elevPostFrameSpacing" value="0.2" inputmode="decimal" placeholder="Espacement cadres (m)">
-          </div>
-        </div>
-        
-        <div class="summary-box">
-          <h3 class="summary-title">📊 Résultats</h3>
-          <div class="summary-item">
-            <span>㎥ Volume béton:</span>
-            <span id="elevPostVolume">-- m³</span>
-          </div>
-          <div class="summary-item">
-            <span>钢筋 Acier longitudinal:</span>
-            <span id="elevPostSteelLong">-- kg</span>
-          </div>
-          <div class="summary-item">
-            <span>🔲 Cadres:</span>
-            <span id="elevPostSteelFrames">-- kg</span>
-          </div>
-          <div class="summary-item">
-            <span>💰 Coût total:</span>
-            <span id="elevPostCost">-- XOF</span>
-          </div>
-        </div>
-        
-        <div class="button-group">
-          <button class="btn btn-outline" onclick="prevScreen(5)">
-            <span class="btn-icon">⬅️</span>
-            Précédent
-          </button>
-          <button class="btn btn-primary" onclick="nextScreen(5)">
-            Suivant
-            <span class="btn-icon">➡️</span>
-          </button>
-        </div>
-      </section>
-
-      <!-- Écran 6 : Chaînages -->
-      <section id="screen6" class="screen">
-        <div class="screen-header">
-          <h2 class="screen-title">⛓️ Chaînage</h2>
-          <p class="screen-subtitle">Renfort horizontal</p>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">📏 Dimensions chaînage (m)</label>
-          <div class="input-group">
-            <div class="form-group">
-              <input type="text" class="form-input" id="beamWidth" value="0.2" inputmode="decimal">
-              <small>Largeur</small>
-            </div>
-            <div class="form-group">
-              <input type="text" class="form-input" id="beamHeight" value="0.2" inputmode="decimal">
-              <small>Hauteur</small>
-            </div>
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">钢筋 Ferraillage</label>
-          <div class="input-group">
-            <div class="form-group">
-              <input type="text" class="form-input" id="beamRebarDiameter" value="10" inputmode="decimal">
-              <small>⌀ (mm)</small>
-            </div>
-            <div class="form-group">
-              <input type="text" class="form-input" id="beamRebarCount" value="4" inputmode="decimal">
-              <small>Nb barres</small>
-            </div>
-          </div>
-          <div class="form-group">
-            <input type="text" class="form-input" id="beamRebarSpacing" value="200" inputmode="decimal" placeholder="Espacement cadres (mm)">
-          </div>
-        </div>
-        
-        <div class="summary-box">
-          <h3 class="summary-title">📊 Résultats</h3>
-          <div class="summary-item">
-            <span>㎥ Volume béton:</span>
-            <span id="beamVolume">-- m³</span>
-          </div>
-          <div class="summary-item">
-            <span>钢筋 Acier longitudinal:</span>
-            <span id="beamSteelLong">-- kg</span>
-          </div>
-          <div class="summary-item">
-            <span>🔲 Cadres:</span>
-            <span id="beamSteelFrames">-- kg</span>
-          </div>
-          <div class="summary-item">
-            <span>💰 Coût total:</span>
-            <span id="beamCost">-- XOF</span>
-          </div>
-        </div>
-        
-        <div class="button-group">
-          <button class="btn btn-outline" onclick="prevScreen(6)">
-            <span class="btn-icon">⬅️</span>
-            Précédent
-          </button>
-          <button class="btn btn-primary" onclick="nextScreen(6)">
-            Suivant
-            <span class="btn-icon">➡️</span>
-          </button>
-        </div>
-      </section>
-
-      <!-- Écran 7 : Mur (briques/parpaings) -->
-      <section id="screen7" class="screen">
-        <div class="screen-header">
-          <h2 class="screen-title">🧱 Mur</h2>
-          <p class="screen-subtitle">Maçonnerie principale</p>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">📏 Épaisseur du mur (m)</label>
-          <input type="text" class="form-input" id="brickThickness" value="0.2" inputmode="decimal">
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">🏷️ Type de brique</label>
-          <select class="form-select" id="brickType">
-            <option value="15x20x40">Brique 15x20x40</option>
-            <option value="20x20x40">Brique pleine 20x20x40</option>
-            <option value="20x20x50">Bloc creux 20x20x50</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">📐 Joints et enduits</label>
-          <div class="input-group">
-            <div class="form-group">
-              <input type="text" class="form-input" id="mortarThickness" value="10" inputmode="decimal">
-              <small>Joints (mm)</small>
-            </div>
-            <div class="form-group">
-              <input type="text" class="form-input" id="renderThickness" value="15" inputmode="decimal">
-              <small>Enduit (mm)</small>
-            </div>
-          </div>
-        </div>
-        
-        <div class="summary-box">
-          <h3 class="summary-title">📊 Résultats</h3>
-          <div class="summary-item">
-            <span>㎥ Volume maçonnerie:</span>
-            <span id="brickVolume">-- m³</span>
-          </div>
-          <div class="summary-item">
-            <span>🧱 Nombre de briques:</span>
-            <span id="brickCount">-- unités</span>
-          </div>
-          <div class="summary-item">
-            <span>💧 Mortier:</span>
-            <span id="mortarVolume">-- m³</span>
-          </div>
-          <div class="summary-item">
-            <span>🎨 Enduit:</span>
-            <span id="renderVolume">-- m³</span>
-          </div>
-          <div class="summary-item">
-            <span>💰 Coût total:</span>
-            <span id="brickCost">-- XOF</span>
-          </div>
-        </div>
-        
-        <div class="button-group">
-          <button class="btn btn-outline" onclick="prevScreen(7)">
-            <span class="btn-icon">⬅️</span>
-            Précédent
-          </button>
-          <button class="btn btn-primary" onclick="nextScreen(7)">
-            Suivant
-            <span class="btn-icon">➡️</span>
-          </button>
-        </div>
-      </section>
-
-      <!-- Écran 8 : Récapitulatif -->
-      <section id="screen8" class="screen">
-        <div class="screen-header">
-          <h2 class="screen-title">📋 Récapitulatif</h2>
-          <p class="screen-subtitle">Devis complet du projet</p>
-        </div>
-        
-        <div class="summary-box">
-          <h3 class="summary-title">💰 Coûts totaux</h3>
-          <div class="summary-item">
-            <span>🧱 Matériaux:</span>
-            <span id="totalMaterials">-- XOF</span>
-          </div>
-          <div class="summary-item">
-            <span>👷 Main d'œuvre:</span>
-            <span id="labourCost">-- XOF</span>
-          </div>
-          <div class="summary-item">
-            <span>💰 Total général:</span>
-            <span id="grandTotal">-- XOF</span>
-          </div>
-        </div>
-        
-        <div class="table-container">
-          <table id="summaryTable">
-            <thead>
-              <tr>
-                <th>Élément</th>
-                <th>Vol</th>
-                <th>Ciment</th>
-                <th>Sacs</th>
-                <th>Acier</th>
-                <th>Coût</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Dynamically filled -->
-            </tbody>
-          </table>
-        </div>
-        
-        <div class="actions">
-          <button class="action-btn" onclick="prevScreen(8)">
-            <span class="btn-icon">✏️</span>
-            Modifier
-          </button>
-          <button class="action-btn" onclick="exportPDF()">
-            <span class="btn-icon">📄</span>
-            PDF
-          </button>
-          <button class="action-btn" onclick="exportJSON()">
-            <span class="btn-icon">💾</span>
-            JSON
-          </button>
-          <button class="action-btn" onclick="exportCSV()">
-            <span class="btn-icon">📊</span>
-            CSV
-          </button>
-        </div>
-      </section>
-    </main>
-  </div>
-
-  <div class="notification" id="notification"></div>
-
-  <script>
-    // Global state
-    let currentScreen = 1;
-    const totalScreens = 8;
-    let projectData = {
-      metadata: {
-        date: new Date().toISOString(),
-        client: "Client Exemple",
-        parcelle: {}
-      },
-      items: [],
-      total: {
-        materials: 0,
-        labour: 0,
-        grand_total: 0
-      }
-    };
-
-    // Initialize stepper
-    function initStepper() {
-      const stepper = document.getElementById('stepper');
-      stepper.innerHTML = '';
-      for (let i = 1; i <= totalScreens; i++) {
-        const step = document.createElement('div');
-        step.className = 'step';
-        step.textContent = i;
-        step.dataset.screen = i;
-        step.onclick = () => goToScreen(i);
-        stepper.appendChild(step);
-      }
-      updateStepper();
-    }
-
-    function updateStepper() {
-      const steps = document.querySelectorAll('.step');
-      steps.forEach((step, index) => {
-        step.classList.remove('active', 'completed');
-        if (index + 1 === currentScreen) {
-          step.classList.add('active');
-        } else if (index + 1 < currentScreen) {
-          step.classList.add('completed');
+        // Fonctions de navigation
+        function nextScreen() {
+            if (currentScreen < screens.length - 1) {
+                // Sauvegarder les résultats de l'écran actuel
+                saveCurrentScreenResults();
+                
+                screens[currentScreen].classList.remove('active');
+                currentScreen++;
+                screens[currentScreen].classList.add('active');
+                
+                // Mettre à jour la barre de progression
+                updateProgressBar();
+                
+                // Calculer les résultats pour le nouvel écran
+                calculateCurrentScreenResults();
+                
+                // Faire défiler vers le haut
+                window.scrollTo(0, 0);
+            }
         }
-      });
-    }
-
-    function goToScreen(screen) {
-      if (screen <= currentScreen) {
-        document.getElementById(`screen${currentScreen}`).classList.remove('active');
-        currentScreen = screen;
-        document.getElementById(`screen${currentScreen}`).classList.add('active');
-        updateStepper();
-      }
-    }
-
-    function nextScreen(screen) {
-      if (validateScreen(screen)) {
-        document.getElementById(`screen${screen}`).classList.remove('active');
-        currentScreen++;
-        document.getElementById(`screen${currentScreen}`).classList.add('active');
-        updateStepper();
-        if (currentScreen === 2) calculateScreen1();
-        if (currentScreen === 3) calculateScreen2();
-        if (currentScreen === 4) calculateScreen3();
-        if (currentScreen === 5) calculateScreen4();
-        if (currentScreen === 6) calculateScreen5();
-        if (currentScreen === 7) calculateScreen6();
-        if (currentScreen === 8) calculateScreen7();
-      }
-    }
-
-    function prevScreen(screen) {
-      document.getElementById(`screen${screen}`).classList.remove('active');
-      currentScreen--;
-      document.getElementById(`screen${currentScreen}`).classList.add('active');
-      updateStepper();
-    }
-
-    function validateScreen(screen) {
-      let valid = true;
-      let error = "";
-      if (screen === 1) {
-        const length = parseFloat(document.getElementById('length').value.replace(',', '.'));
-        const width = parseFloat(document.getElementById('width').value.replace(',', '.'));
-        const perimeter = parseFloat(document.getElementById('perimeter').value.replace(',', '.'));
-        if ((isNaN(length) || isNaN(width)) && isNaN(perimeter)) {
-          error = "Entrez les dimensions ou le périmètre";
-          valid = false;
+        
+        function prevScreen() {
+            if (currentScreen > 0) {
+                screens[currentScreen].classList.remove('active');
+                currentScreen--;
+                screens[currentScreen].classList.add('active');
+                
+                // Mettre à jour la barre de progression
+                updateProgressBar();
+                
+                // Faire défiler vers le haut
+                window.scrollTo(0, 0);
+            }
         }
-      }
-      if (!valid) {
-        showNotification(error, 'error');
-      }
-      return valid;
-    }
-
-    function showNotification(message, type = 'success') {
-      const notification = document.getElementById('notification');
-      notification.textContent = message;
-      notification.className = `notification ${type} show`;
-      setTimeout(() => {
-        notification.classList.remove('show');
-      }, 3000);
-    }
-
-    function calculateScreen1() {
-      const length = parseFloat(document.getElementById('length').value.replace(',', '.'));
-      const width = parseFloat(document.getElementById('width').value.replace(',', '.'));
-      let perimeter = parseFloat(document.getElementById('perimeter').value.replace(',', '.'));
-      const wallWidth = parseFloat(document.getElementById('wallWidth').value.replace(',', '.'));
-      const wallHeight = parseFloat(document.getElementById('wallHeight').value.replace(',', '.'));
-
-      if (!isNaN(length) && !isNaN(width)) {
-        perimeter = 2 * (length + width);
-        document.getElementById('perimeter').value = perimeter.toFixed(2);
-      }
-
-      const area = length && width ? length * width : 0;
-
-      document.getElementById('displayPerimeter').textContent = perimeter ? perimeter.toFixed(2) + ' m' : '-- m';
-      document.getElementById('displayArea').textContent = area ? area.toFixed(2) + ' m²' : '-- m²';
-
-      projectData.metadata.parcelle = {
-        perimetre: perimeter || 0,
-        surface: area || 0,
-        L: length || 0,
-        W: width || 0
-      };
-    }
-
-    function calculateScreen2() {
-      const perimeter = projectData.metadata.parcelle.perimetre || 0;
-      const width = parseFloat(document.getElementById('cleaningWidth').value.replace(',', '.'));
-      const thickness = parseFloat(document.getElementById('cleaningThickness').value.replace(',', '.'));
-      const dosage = parseFloat(document.getElementById('cementDosage').value.replace(',', '.'));
-      const cementPrice = parseFloat(document.getElementById('cementPrice').value.replace(',', '.'));
-      const gravelPrice = parseFloat(document.getElementById('gravelPrice').value.replace(',', '.'));
-      const sandPrice = parseFloat(document.getElementById('sandPrice').value.replace(',', '.'));
-
-      const volume = perimeter * width * thickness;
-      const cementKg = volume * dosage;
-      const sacks = Math.ceil(cementKg / 50);
-      const gravelVol = volume * 0.8;
-      const sandVol = volume * 0.45;
-
-      const cost = sacks * cementPrice + gravelVol * gravelPrice + sandVol * sandPrice;
-
-      document.getElementById('cleaningVolume').textContent = volume.toFixed(2) + ' m³';
-      document.getElementById('cleaningCement').textContent = cementKg.toFixed(2) + ' kg';
-      document.getElementById('cleaningSacks').textContent = sacks + ' sacs';
-      document.getElementById('cleaningCost').textContent = cost.toFixed(2) + ' XOF';
-
-      projectData.items[0] = {
-        name: "Béton de propreté",
-        volume_m3: volume,
-        cement_kg: cementKg,
-        sacks: sacks,
-        gravel_m3: gravelVol,
-        sand_m3: sandVol,
-        costs: {
-          cement: sacks * cementPrice,
-          gravel: gravelVol * gravelPrice,
-          sand: sandVol * sandPrice
+        
+        function updateProgressBar() {
+            const progress = ((currentScreen + 1) / screens.length) * 100;
+            progressBar.style.width = `${progress}%`;
         }
-      };
-    }
-
-    function calculateScreen3() {
-      const perimeter = projectData.metadata.parcelle.perimetre || 0;
-      const width = parseFloat(document.getElementById('footingWidth').value.replace(',', '.'));
-      const height = parseFloat(document.getElementById('footingHeight').value.replace(',', '.'));
-      const dosage = parseFloat(document.getElementById('footingCementDosage').value.replace(',', '.'));
-      const rebarDiamLong = parseFloat(document.getElementById('rebarDiameterLong').value.replace(',', '.'));
-      const rebarCountLong = parseFloat(document.getElementById('rebarCountLong').value.replace(',', '.'));
-      const rebarDiamTrans = parseFloat(document.getElementById('rebarDiameterTrans').value.replace(',', '.'));
-      const rebarSpacingTrans = parseFloat(document.getElementById('rebarSpacingTrans').value.replace(',', '.')) / 1000;
-      const steelPrice = parseFloat(document.getElementById('steelPrice').value.replace(',', '.'));
-
-      const volume = perimeter * width * height;
-      const cementKg = volume * dosage;
-      const sacks = Math.ceil(cementKg / 50);
-      const gravelVol = volume * 0.8;
-      const sandVol = volume * 0.45;
-
-      // Steel calculations
-      const steelLongLength = perimeter * rebarCountLong;
-      const steelLongMass = steelLongLength * 0.006165177 * rebarDiamLong * rebarDiamLong;
-
-      const transCount = Math.ceil(perimeter / rebarSpacingTrans);
-      const transLength = (2 * width + 2 * height) + 2 * 0.1; // Adding hooks
-      const steelTransMass = transCount * transLength * 0.006165177 * rebarDiamTrans * rebarDiamTrans;
-
-      const totalSteelMass = steelLongMass + steelTransMass;
-      const steelCost = totalSteelMass * steelPrice;
-
-      const cost = sacks * 70000 + gravelVol * 20000 + sandVol * 4000 + steelCost;
-
-      document.getElementById('footingVolume').textContent = volume.toFixed(2) + ' m³';
-      document.getElementById('footingSteelLong').textContent = steelLongMass.toFixed(2) + ' kg';
-      document.getElementById('footingSteelTrans').textContent = steelTransMass.toFixed(2) + ' kg';
-      document.getElementById('footingCost').textContent = cost.toFixed(2) + ' XOF';
-
-      projectData.items[1] = {
-        name: "Semelle filante",
-        volume_m3: volume,
-        cement_kg: cementKg,
-        sacks: sacks,
-        gravel_m3: gravelVol,
-        sand_m3: sandVol,
-        steel_kg: totalSteelMass,
-        costs: {
-          cement: sacks * 70000,
-          gravel: gravelVol * 20000,
-          sand: sandVol * 4000,
-          steel: steelCost
+        
+        function saveCurrentScreenResults() {
+            switch (currentScreen) {
+                case 1: // Béton de propreté
+                    saveBetonPropreteResults();
+                    break;
+                case 2: // Semelle filante
+                    saveSemelleResults();
+                    break;
+                case 3: // Poteaux amorces
+                    savePoteauxAmorcesResults();
+                    break;
+                case 4: // Poteau en élévation
+                    savePoteauElevationResults();
+                    break;
+                case 5: // Chainage de couronnement
+                    saveChainageCouronnementResults();
+                    break;
+                case 6: // Chainage bas
+                    saveChainageBasResults();
+                    break;
+                case 7: // Brique plein
+                    saveBriquePleinResults();
+                    break;
+                case 8: // Brique creuse
+                    saveBriqueCreuseResults();
+                    break;
+                case 9: // Joint et enduit
+                    saveJointEnduitResults();
+                    break;
+            }
         }
-      };
-    }
-
-    function calculateScreen4() {
-      const postWidth = parseFloat(document.getElementById('postWidth').value.replace(',', '.'));
-      const postLength = parseFloat(document.getElementById('postLength').value.replace(',', '.'));
-      const postHeight = parseFloat(document.getElementById('postHeight').value.replace(',', '.'));
-      const postCount = parseFloat(document.getElementById('postCount').value.replace(',', '.'));
-      const dosage = parseFloat(document.getElementById('postCementDosage').value.replace(',', '.'));
-      const rebarCount = parseFloat(document.getElementById('postRebarCount').value.replace(',', '.'));
-      const rebarDiameter = parseFloat(document.getElementById('postRebarDiameter').value.replace(',', '.'));
-      const frameSpacing = parseFloat(document.getElementById('postFrameSpacing').value.replace(',', '.'));
-
-      const volume = postWidth * postLength * postHeight * postCount;
-      const cementKg = volume * dosage;
-      const sacks = Math.ceil(cementKg / 50);
-      const gravelVol = volume * 0.8;
-      const sandVol = volume * 0.45;
-
-      // Steel calculations
-      const steelLongLength = postHeight * rebarCount * postCount;
-      const steelLongMass = steelLongLength * 0.006165177 * rebarDiameter * rebarDiameter;
-
-      const frameCount = Math.floor(postHeight / frameSpacing) * postCount;
-      const frameLength = 2 * (postWidth + postLength) + 0.2; // Adding hooks
-      const steelFrameMass = frameCount * frameLength * 0.006165177 * 8 * 8;
-
-      const totalSteelMass = steelLongMass + steelFrameMass;
-      const steelCost = totalSteelMass * 450;
-
-      const cost = sacks * 70000 + gravelVol * 20000 + sandVol * 4000 + steelCost;
-
-      document.getElementById('postVolume').textContent = volume.toFixed(2) + ' m³';
-      document.getElementById('postSteelLong').textContent = steelLongMass.toFixed(2) + ' kg';
-      document.getElementById('postSteelFrames').textContent = steelFrameMass.toFixed(2) + ' kg';
-      document.getElementById('postCost').textContent = cost.toFixed(2) + ' XOF';
-
-      projectData.items[2] = {
-        name: "Poteaux amorces",
-        volume_m3: volume,
-        cement_kg: cementKg,
-        sacks: sacks,
-        gravel_m3: gravelVol,
-        sand_m3: sandVol,
-        steel_kg: totalSteelMass,
-        costs: {
-          cement: sacks * 70000,
-          gravel: gravelVol * 20000,
-          sand: sandVol * 4000,
-          steel: steelCost
+        
+        function calculateCurrentScreenResults() {
+            switch (currentScreen) {
+                case 1: // Béton de propreté
+                    calculateBetonProprete();
+                    break;
+                case 2: // Semelle filante
+                    calculateSemelle();
+                    break;
+                case 3: // Poteaux amorces
+                    calculatePoteauxAmorces();
+                    break;
+                case 4: // Poteau en élévation
+                    calculatePoteauElevation();
+                    break;
+                case 5: // Chainage de couronnement
+                    calculateChainageCouronnement();
+                    break;
+                case 6: // Chainage bas
+                    calculateChainageBas();
+                    break;
+                case 7: // Brique plein
+                    calculateBriquePlein();
+                    break;
+                case 8: // Brique creuse
+                    calculateBriqueCreuse();
+                    break;
+                case 9: // Joint et enduit
+                    calculateJointEnduit();
+                    break;
+            }
         }
-      };
-    }
-
-    function calculateScreen5() {
-      const postHeight = parseFloat(document.getElementById('elevPostHeight').value.replace(',', '.'));
-      const postCount = projectData.items[2] ? projectData.items[2].volume_m3 / (0.3 * 0.3 * 0.5) : 10;
-      const rebarCount = parseFloat(document.getElementById('elevPostRebarCount').value.replace(',', '.'));
-      const rebarDiameter = parseFloat(document.getElementById('elevPostRebarDiameter').value.replace(',', '.'));
-      const frameSpacing = parseFloat(document.getElementById('elevPostFrameSpacing').value.replace(',', '.'));
-
-      const postWidth = 0.3;
-      const postLength = 0.3;
-      const volume = postWidth * postLength * postHeight * postCount;
-      const cementKg = volume * 350;
-      const sacks = Math.ceil(cementKg / 50);
-      const gravelVol = volume * 0.8;
-      const sandVol = volume * 0.45;
-
-      // Steel calculations
-      const steelLongLength = postHeight * rebarCount * postCount;
-      const steelLongMass = steelLongLength * 0.006165177 * rebarDiameter * rebarDiameter;
-
-      const frameCount = Math.floor(postHeight / frameSpacing) * postCount;
-      const frameLength = 2 * (postWidth + postLength) + 0.2;
-      const steelFrameMass = frameCount * frameLength * 0.006165177 * 8 * 8;
-
-      const totalSteelMass = steelLongMass + steelFrameMass;
-      const steelCost = totalSteelMass * 450;
-
-      const cost = sacks * 70000 + gravelVol * 20000 + sandVol * 4000 + steelCost;
-
-      document.getElementById('elevPostVolume').textContent = volume.toFixed(2) + ' m³';
-      document.getElementById('elevPostSteelLong').textContent = steelLongMass.toFixed(2) + ' kg';
-      document.getElementById('elevPostSteelFrames').textContent = steelFrameMass.toFixed(2) + ' kg';
-      document.getElementById('elevPostCost').textContent = cost.toFixed(2) + ' XOF';
-
-      projectData.items[3] = {
-        name: "Poteaux en élévation",
-        volume_m3: volume,
-        cement_kg: cementKg,
-        sacks: sacks,
-        gravel_m3: gravelVol,
-        sand_m3: sandVol,
-        steel_kg: totalSteelMass,
-        costs: {
-          cement: sacks * 70000,
-          gravel: gravelVol * 20000,
-          sand: sandVol * 4000,
-          steel: steelCost
+        
+        // Fonctions de calcul pour chaque écran
+        function calculateBetonProprete() {
+            const perimeter = parseFloat(document.getElementById('perimeter').value) || 0;
+            const largeurFouille = parseFloat(document.getElementById('largeur-fouille-beton').value) || 0;
+            const epaisseurBeton = parseFloat(document.getElementById('epaisseur-beton').value) || 0;
+            const dosage = parseFloat(document.getElementById('dosage-beton').value) || 0;
+            
+            const volume = perimeter * largeurFouille * epaisseurBeton;
+            const ciment = volume * dosage;
+            const gravier = volume * 0.8; // 80% du volume
+            const sable = volume * 0.4; // 40% du volume
+            
+            document.getElementById('volume-beton-proprete').textContent = volume.toFixed(2) + ' m³';
+            document.getElementById('ciment-beton-proprete').textContent = ciment.toFixed(2) + ' kg';
+            document.getElementById('gravier-beton-proprete').textContent = gravier.toFixed(2) + ' m³';
+            document.getElementById('sable-beton-proprete').textContent = sable.toFixed(2) + ' m³';
         }
-      };
-    }
-
-    function calculateScreen6() {
-      const perimeter = projectData.metadata.parcelle.perimetre || 0;
-      const beamWidth = parseFloat(document.getElementById('beamWidth').value.replace(',', '.'));
-      const beamHeight = parseFloat(document.getElementById('beamHeight').value.replace(',', '.'));
-      const rebarDiameter = parseFloat(document.getElementById('beamRebarDiameter').value.replace(',', '.'));
-      const rebarCount = parseFloat(document.getElementById('beamRebarCount').value.replace(',', '.'));
-      const rebarSpacing = parseFloat(document.getElementById('beamRebarSpacing').value.replace(',', '.')) / 1000;
-
-      const volume = perimeter * beamWidth * beamHeight * 2; // Bas + Couronnement
-      const cementKg = volume * 350;
-      const sacks = Math.ceil(cementKg / 50);
-      const gravelVol = volume * 0.8;
-      const sandVol = volume * 0.45;
-
-      // Steel calculations
-      const steelLongLength = perimeter * rebarCount * 2;
-      const steelLongMass = steelLongLength * 0.006165177 * rebarDiameter * rebarDiameter;
-
-      const frameCount = Math.ceil(perimeter / rebarSpacing) * 2;
-      const frameLength = (beamWidth + beamHeight) * 2 + 0.2;
-      const steelFrameMass = frameCount * frameLength * 0.006165177 * 8 * 8;
-
-      const totalSteelMass = steelLongMass + steelFrameMass;
-      const steelCost = totalSteelMass * 450;
-
-      const cost = sacks * 70000 + gravelVol * 20000 + sandVol * 4000 + steelCost;
-
-      document.getElementById('beamVolume').textContent = volume.toFixed(2) + ' m³';
-      document.getElementById('beamSteelLong').textContent = steelLongMass.toFixed(2) + ' kg';
-      document.getElementById('beamSteelFrames').textContent = steelFrameMass.toFixed(2) + ' kg';
-      document.getElementById('beamCost').textContent = cost.toFixed(2) + ' XOF';
-
-      projectData.items[4] = {
-        name: "Chaînage bas & Couronnement",
-        volume_m3: volume,
-        cement_kg: cementKg,
-        sacks: sacks,
-        gravel_m3: gravelVol,
-        sand_m3: sandVol,
-        steel_kg: totalSteelMass,
-        costs: {
-          cement: sacks * 70000,
-          gravel: gravelVol * 20000,
-          sand: sandVol * 4000,
-          steel: steelCost
+        
+        function saveBetonPropreteResults() {
+            const volume = parseFloat(document.getElementById('volume-beton-proprete').textContent) || 0;
+            const ciment = parseFloat(document.getElementById('ciment-beton-proprete').textContent) || 0;
+            const gravier = parseFloat(document.getElementById('gravier-beton-proprete').textContent) || 0;
+            const sable = parseFloat(document.getElementById('sable-beton-proprete').textContent) || 0;
+            
+            results.betonProprete.ciment = ciment;
+            results.betonProprete.sable = sable;
+            results.betonProprete.gravier = gravier;
         }
-      };
-    }
-
-    function calculateScreen7() {
-      const perimeter = projectData.metadata.parcelle.perimetre || 0;
-      const height = projectData.metadata.parcelle.W ? projectData.metadata.parcelle.W : 2;
-      const thickness = parseFloat(document.getElementById('brickThickness').value.replace(',', '.'));
-      const brickType = document.getElementById('brickType').value;
-      const mortarThickness = parseFloat(document.getElementById('mortarThickness').value.replace(',', '.')) / 1000;
-      const renderThickness = parseFloat(document.getElementById('renderThickness').value.replace(',', '.')) / 1000;
-
-      let brickDims = [0.15, 0.2, 0.4]; // Default
-      if (brickType === "20x20x40") brickDims = [0.2, 0.2, 0.4];
-      if (brickType === "20x20x50") brickDims = [0.2, 0.2, 0.5];
-
-      const brickVol = (brickDims[0] + mortarThickness) * (brickDims[1] + mortarThickness) * (brickDims[2] + mortarThickness);
-      const wallVol = perimeter * height * thickness;
-      const brickCount = Math.ceil(wallVol / brickVol);
-
-      const mortarVol = wallVol * 0.15; // Approx
-      const renderVol = perimeter * height * 2 * renderThickness; // Both sides
-
-      const cost = brickCount * 100 + mortarVol * 5000 + renderVol * 6000;
-
-      document.getElementById('brickVolume').textContent = wallVol.toFixed(2) + ' m³';
-      document.getElementById('brickCount').textContent = brickCount + ' unités';
-      document.getElementById('mortarVolume').textContent = mortarVol.toFixed(2) + ' m³';
-      document.getElementById('renderVolume').textContent = renderVol.toFixed(2) + ' m³';
-      document.getElementById('brickCost').textContent = cost.toFixed(2) + ' XOF';
-
-      projectData.items[5] = {
-        name: "Mur (briques/parpaings)",
-        volume_m3: wallVol,
-        brick_count: brickCount,
-        mortar_m3: mortarVol,
-        render_m3: renderVol,
-        costs: {
-          bricks: brickCount * 100,
-          mortar: mortarVol * 5000,
-          render: renderVol * 6000
+        
+        function calculateSemelle() {
+            const perimeter = parseFloat(document.getElementById('perimeter').value) || 0;
+            const largeurFouille = parseFloat(document.getElementById('largeur-fouille-semelle').value) || 0;
+            const epaisseurSemelle = parseFloat(document.getElementById('epaisseur-semelle').value) || 0;
+            const dosage = parseFloat(document.getElementById('dosage-semelle').value) || 0;
+            const diametreLongitudinal = parseFloat(document.getElementById('diametre-longitudinal').value) || 0;
+            const nombreBarresLongitudinal = parseFloat(document.getElementById('nombre-barres-longitudinal').value) || 0;
+            const diametreTransversal = parseFloat(document.getElementById('diametre-transversal').value) || 0;
+            const espacementTransversal = parseFloat(document.getElementById('espacement-transversal').value) || 0;
+            const longueurTransversal = parseFloat(document.getElementById('longueur-transversal').value) || 0;
+            
+            const volume = perimeter * largeurFouille * epaisseurSemelle;
+            const ciment = volume * dosage;
+            const gravier = volume * 0.8; // 80% du volume
+            const sable = volume * 0.4; // 40% du volume
+            
+            // Calcul de l'acier longitudinal
+            const longueurAcierLongitudinal = nombreBarresLongitudinal * perimeter;
+            const poidsAcierLongitudinal = longueurAcierLongitudinal * (acierPoidsLineaire[diametreLongitudinal] || 0);
+            
+            // Calcul de l'acier transversal
+            const nombreBarresTransversal = Math.ceil(perimeter / espacementTransversal);
+            const longueurAcierTransversal = nombreBarresTransversal * longueurTransversal;
+            const poidsAcierTransversal = longueurAcierTransversal * (acierPoidsLineaire[diametreTransversal] || 0);
+            
+            document.getElementById('volume-semelle').textContent = volume.toFixed(2) + ' m³';
+            document.getElementById('ciment-semelle').textContent = ciment.toFixed(2) + ' kg';
+            document.getElementById('gravier-semelle').textContent = gravier.toFixed(2) + ' m³';
+            document.getElementById('sable-semelle').textContent = sable.toFixed(2) + ' m³';
+            document.getElementById('acier-longitudinal-semelle').textContent = poidsAcierLongitudinal.toFixed(2) + ' kg';
+            document.getElementById('acier-transversal-semelle').textContent = poidsAcierTransversal.toFixed(2) + ' kg';
         }
-      };
-
-      calculateSummary();
-    }
-
-    function calculateSummary() {
-      let totalMaterials = 0;
-      let totalLabour = 0;
-      let grandTotal = 0;
-
-      projectData.items.forEach(item => {
-        if (item.costs) {
-          Object.values(item.costs).forEach(val => totalMaterials += val);
+        
+        function saveSemelleResults() {
+            const ciment = parseFloat(document.getElementById('ciment-semelle').textContent) || 0;
+            const gravier = parseFloat(document.getElementById('gravier-semelle').textContent) || 0;
+            const sable = parseFloat(document.getElementById('sable-semelle').textContent) || 0;
+            const poidsAcierLongitudinal = parseFloat(document.getElementById('acier-longitudinal-semelle').textContent) || 0;
+            const poidsAcierTransversal = parseFloat(document.getElementById('acier-transversal-semelle').textContent) || 0;
+            const diametreLongitudinal = parseFloat(document.getElementById('diametre-longitudinal').value) || 0;
+            const diametreTransversal = parseFloat(document.getElementById('diametre-transversal').value) || 0;
+            
+            results.semelle.ciment = ciment;
+            results.semelle.sable = sable;
+            results.semelle.gravier = gravier;
+            
+            if (diametreLongitudinal > 0) {
+                results.semelle.acier[diametreLongitudinal] = (results.semelle.acier[diametreLongitudinal] || 0) + poidsAcierLongitudinal;
+            }
+            
+            if (diametreTransversal > 0) {
+                results.semelle.acier[diametreTransversal] = (results.semelle.acier[diametreTransversal] || 0) + poidsAcierTransversal;
+            }
         }
-      });
-
-      totalLabour = totalMaterials * 0.3; // 30% main d'œuvre
-      grandTotal = totalMaterials + totalLabour;
-
-      projectData.total.materials = totalMaterials;
-      projectData.total.labour = totalLabour;
-      projectData.total.grand_total = grandTotal;
-
-      document.getElementById('totalMaterials').textContent = totalMaterials.toFixed(2) + ' XOF';
-      document.getElementById('labourCost').textContent = totalLabour.toFixed(2) + ' XOF';
-      document.getElementById('grandTotal').textContent = grandTotal.toFixed(2) + ' XOF';
-
-      const tbody = document.getElementById('summaryTable').querySelector('tbody');
-      tbody.innerHTML = '';
-      projectData.items.forEach(item => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${item.name}</td>
-          <td>${item.volume_m3 ? item.volume_m3.toFixed(1) : ''}</td>
-          <td>${item.cement_kg ? item.cement_kg.toFixed(0) : ''}</td>
-          <td>${item.sacks || ''}</td>
-          <td>${item.steel_kg ? item.steel_kg.toFixed(0) : ''}</td>
-          <td>${Object.values(item.costs || {}).reduce((a,b) => a+b, 0).toFixed(0)}</td>
-        `;
-        tbody.appendChild(row);
-      });
-    }
-
-    function exportPDF() {
-      showNotification("Export PDF simulé", 'success');
-    }
-
-    function exportJSON() {
-      const dataStr = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(projectData, null, 2));
-      const downloadAnchorNode = document.createElement('a');
-      downloadAnchorNode.setAttribute("href", dataStr);
-      downloadAnchorNode.setAttribute("download", "devis_mur.json");
-      document.body.appendChild(downloadAnchorNode);
-      downloadAnchorNode.click();
-      downloadAnchorNode.remove();
-      showNotification("JSON téléchargé!", 'success');
-    }
-
-    function exportCSV() {
-      let csv = 'Élément,Volume (m³),Ciment (kg),Sacs,Acier (kg),Coût (XOF)\n';
-      projectData.items.forEach(item => {
-        csv += `"${item.name}",${item.volume_m3 || ''},${item.cement_kg || ''},${item.sacks || ''},${item.steel_kg || ''},${Object.values(item.costs || {}).reduce((a,b) => a+b, 0)}\n`;
-      });
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement("a");
-      const url = URL.createObjectURL(blob);
-      link.setAttribute("href", url);
-      link.setAttribute("download", "devis_mur.csv");
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      showNotification("CSV téléchargé!", 'success');
-    }
-
-    // Initialize
-    window.onload = function() {
-      initStepper();
-    };
-  </script>
+        
+        function calculatePoteauxAmorces() {
+            const longueurPoteau = parseFloat(document.getElementById('longueur-poteau-amorce').value) || 0;
+            const largeurPoteau = parseFloat(document.getElementById('largeur-poteau-amorce').value) || 0;
+            const hauteurPoteau = parseFloat(document.getElementById('hauteur-poteau-amorce').value) || 0;
+            const nombrePoteaux = parseFloat(document.getElementById('nombre-poteaux-amorces').value) || 0;
+            const dosage = parseFloat(document.getElementById('dosage-poteau-amorce').value) || 0;
+            const nombreBarresLongitudinal = parseFloat(document.getElementById('nombre-barres-longitudinal-poteau-amorce').value) || 0;
+            const diametreBarreLongitudinal = parseFloat(document.getElementById('diametre-barre-longitudinal-poteau-amorce').value) || 0;
+            const diametreBarreTransversal = parseFloat(document.getElementById('diametre-barre-transversal-poteau-amorce').value) || 0;
+            const espacementCadres = parseFloat(document.getElementById('espacement-cadres-poteau-amorce').value) || 0;
+            const longueurCadre = parseFloat(document.getElementById('longueur-cadre-poteau-amorce').value) || 0;
+            
+            const volume = longueurPoteau * largeurPoteau * hauteurPoteau * nombrePoteaux;
+            const ciment = volume * dosage;
+            const gravier = volume * 0.8; // 80% du volume
+            const sable = volume * 0.4; // 40% du volume
+            
+            // Calcul de l'acier longitudinal
+            const longueurAcierLongitudinal = nombreBarresLongitudinal * hauteurPoteau * nombrePoteaux;
+            const poidsAcierLongitudinal = longueurAcierLongitudinal * (acierPoidsLineaire[diametreBarreLongitudinal] || 0);
+            
+            // Calcul de l'acier transversal
+            const nombreCadres = Math.ceil(hauteurPoteau / espacementCadres) * nombrePoteaux;
+            const longueurAcierTransversal = nombreCadres * longueurCadre;
+            const poidsAcierTransversal = longueurAcierTransversal * (acierPoidsLineaire[diametreBarreTransversal] || 0);
+            
+            document.getElementById('volume-poteaux-amorces').textContent = volume.toFixed(2) + ' m³';
+            document.getElementById('ciment-poteaux-amorces').textContent = ciment.toFixed(2) + ' kg';
+            document.getElementById('gravier-poteaux-amorces').textContent = gravier.toFixed(2) + ' m³';
+            document.getElementById('sable-poteaux-amorces').textContent = sable.toFixed(2) + ' m³';
+            document.getElementById('acier-longitudinal-poteaux-amorces').textContent = poidsAcierLongitudinal.toFixed(2) + ' kg';
+            document.getElementById('acier-transversal-poteaux-amorces').textContent = poidsAcierTransversal.toFixed(2) + ' kg';
+        }
+        
+        function savePoteauxAmorcesResults() {
+            const ciment = parseFloat(document.getElementById('ciment-poteaux-amorces').textContent) || 0;
+            const gravier = parseFloat(document.getElementById('gravier-poteaux-amorces').textContent) || 0;
+            const sable = parseFloat(document.getElementById('sable-poteaux-amorces').textContent) || 0;
+            const poidsAcierLongitudinal = parseFloat(document.getElementById('acier-longitudinal-poteaux-amorces').textContent) || 0;
+            const poidsAcierTransversal = parseFloat(document.getElementById('acier-transversal-poteaux-amorces').textContent) || 0;
+            const diametreBarreLongitudinal = parseFloat(document.getElementById('diametre-barre-longitudinal-poteau-amorce').value) || 0;
+            const diametreBarreTransversal = parseFloat(document.getElementById('diametre-barre-transversal-poteau-amorce').value) || 0;
+            
+            results.poteauxAmorces.ciment = ciment;
+            results.poteauxAmorces.sable = sable;
+            results.poteauxAmorces.gravier = gravier;
+            
+            if (diametreBarreLongitudinal > 0) {
+                results.poteauxAmorces.acier[diametreBarreLongitudinal] = (results.poteauxAmorces.acier[diametreBarreLongitudinal] || 0) + poidsAcierLongitudinal;
+            }
+            
+            if (diametreBarreTransversal > 0) {
+                results.poteauxAmorces.acier[diametreBarreTransversal] = (results.poteauxAmorces.acier[diametreBarreTransversal] || 0) + poidsAcierTransversal;
+            }
+        }
+        
+        function calculatePoteauElevation() {
+            const longueurPoteau = parseFloat(document.getElementById('longueur-poteau-elevation').value) || 0;
+            const largeurPoteau = parseFloat(document.getElementById('largeur-poteau-elevation').value) || 0;
+            const hauteurPoteau = parseFloat(document.getElementById('hauteur-poteau-elevation').value) || 0;
+            const nombrePoteaux = parseFloat(document.getElementById('nombre-poteaux-elevation').value) || 0;
+            const dosage = parseFloat(document.getElementById('dosage-poteau-elevation').value) || 0;
+            const nombreBarresLongitudinal = parseFloat(document.getElementById('nombre-barres-longitudinal-poteau-elevation').value) || 0;
+            const diametreBarreLongitudinal = parseFloat(document.getElementById('diametre-barre-longitudinal-poteau-elevation').value) || 0;
+            const diametreBarreTransversal = parseFloat(document.getElementById('diametre-barre-transversal-poteau-elevation').value) || 0;
+            const espacementCadres = parseFloat(document.getElementById('espacement-cadres-poteau-elevation').value) || 0;
+            const longueurCadre = parseFloat(document.getElementById('longueur-cadre-poteau-elevation').value) || 0;
+            
+            const volume = longueurPoteau * largeurPoteau * hauteurPoteau * nombrePoteaux;
+            const ciment = volume * dosage;
+            const gravier = volume * 0.8; // 80% du volume
+            const sable = volume * 0.4; // 40% du volume
+            
+            // Calcul de l'acier longitudinal
+            const longueurAcierLongitudinal = nombreBarresLongitudinal * hauteurPoteau * nombrePoteaux;
+            const poidsAcierLongitudinal = longueurAcierLongitudinal * (acierPoidsLineaire[diametreBarreLongitudinal] || 0);
+            
+            // Calcul de l'acier transversal
+            const nombreCadres = Math.ceil(hauteurPoteau / espacementCadres) * nombrePoteaux;
+            const longueurAcierTransversal = nombreCadres * longueurCadre;
+            const poidsAcierTransversal = longueurAcierTransversal * (acierPoidsLineaire[diametreBarreTransversal] || 0);
+            
+            document.getElementById('volume-poteau-elevation').textContent = volume.toFixed(2) + ' m³';
+            document.getElementById('ciment-poteau-elevation').textContent = ciment.toFixed(2) + ' kg';
+            document.getElementById('gravier-poteau-elevation').textContent = gravier.toFixed(2) + ' m³';
+            document.getElementById('sable-poteau-elevation').textContent = sable.toFixed(2) + ' m³';
+            document.getElementById('acier-longitudinal-poteau-elevation').textContent = poidsAcierLongitudinal.toFixed(2) + ' kg';
+            document.getElementById('acier-transversal-poteau-elevation').textContent = poidsAcierTransversal.toFixed(2) + ' kg';
+        }
+        
+        function savePoteauElevationResults() {
+            const ciment = parseFloat(document.getElementById('ciment-poteau-elevation').textContent) || 0;
+            const gravier = parseFloat(document.getElementById('gravier-poteau-elevation').textContent) || 0;
+            const sable = parseFloat(document.getElementById('sable-poteau-elevation').textContent) || 0;
+            const poidsAcierLongitudinal = parseFloat(document.getElementById('acier-longitudinal-poteau-elevation').textContent) || 0;
+            const poidsAcierTransversal = parseFloat(document.getElementById('acier-transversal-poteau-elevation').textContent) || 0;
+            const diametreBarreLongitudinal = parseFloat(document.getElementById('diametre-barre-longitudinal-poteau-elevation').value) || 0;
+            const diametreBarreTransversal = parseFloat(document.getElementById('diametre-barre-transversal-poteau-elevation').value) || 0;
+            
+            results.poteauElevation.ciment = ciment;
+            results.poteauElevation.sable = sable;
+            results.poteauElevation.gravier = gravier;
+            
+            if (diametreBarreLongitudinal > 0) {
+                results.poteauElevation.acier[diametreBarreLongitudinal] = (results.poteauElevation.acier[diametreBarreLongitudinal] || 0) + poidsAcierLongitudinal;
+            }
+            
+            if (diametreBarreTransversal > 0) {
+                results.poteauElevation.acier[diametreBarreTransversal] = (results.poteauElevation.acier[diametreBarreTransversal] || 0) + poidsAcierTransversal;
+            }
+        }
+        
+        function calculateChainageCouronnement() {
+            const perimeter = parseFloat(document.getElementById('perimeter').value) || 0;
+            const largeurChainage = parseFloat(document.getElementById('largeur-chainage-couronnement').value) || 0;
+            const hauteurChainage = parseFloat(document.getElementById('hauteur-chainage-couronnement').value) || 0;
+            const dosage = parseFloat(document.getElementById('dosage-chainage-couronnement').value) || 0;
+            const diametreLongitudinal = parseFloat(document.getElementById('diametre-longitudinal-chainage-couronnement').value) || 0;
+            const nombreBarresLongitudinal = parseFloat(document.getElementById('nombre-barres-longitudinal-chainage-couronnement').value) || 0;
+            const diametreTransversal = parseFloat(document.getElementById('diametre-transversal-chainage-couronnement').value) || 0;
+            const espacementTransversal = parseFloat(document.getElementById('espacement-transversal-chainage-couronnement').value) || 0;
+            const longueurTransversal = parseFloat(document.getElementById('longueur-transversal-chainage-couronnement').value) || 0;
+            
+            const volume = perimeter * largeurChainage * hauteurChainage;
+            const ciment = volume * dosage;
+            const gravier = volume * 0.8; // 80% du volume
+            const sable = volume * 0.4; // 40% du volume
+            
+            // Calcul de l'acier longitudinal
+            const longueurAcierLongitudinal = nombreBarresLongitudinal * perimeter;
+            const poidsAcierLongitudinal = longueurAcierLongitudinal * (acierPoidsLineaire[diametreLongitudinal] || 0);
+            
+            // Calcul de l'acier transversal
+            const nombreBarresTransversal = Math.ceil(perimeter / espacementTransversal);
+            const longueurAcierTransversal = nombreBarresTransversal * longueurTransversal;
+            const poidsAcierTransversal = longueurAcierTransversal * (acierPoidsLineaire[diametreTransversal] || 0);
+            
+            document.getElementById('volume-chainage-couronnement').textContent = volume.toFixed(2) + ' m³';
+            document.getElementById('ciment-chainage-couronnement').textContent = ciment.toFixed(2) + ' kg';
+            document.getElementById('gravier-chainage-couronnement').textContent = gravier.toFixed(2) + ' m³';
+            document.getElementById('sable-chainage-couronnement').textContent = sable.toFixed(2) + ' m³';
+            document.getElementById('acier-longitudinal-chainage-couronnement').textContent = poidsAcierLongitudinal.toFixed(2) + ' kg';
+            document.getElementById('acier-transversal-chainage-couronnement').textContent = poidsAcierTransversal.toFixed(2) + ' kg';
+        }
+        
+        function saveChainageCouronnementResults() {
+            const ciment = parseFloat(document.getElementById('ciment-chainage-couronnement').textContent) || 0;
+            const gravier = parseFloat(document.getElementById('gravier-chainage-couronnement').textContent) || 0;
+            const sable = parseFloat(document.getElementById('sable-chainage-couronnement').textContent) || 0;
+            const poidsAcierLongitudinal = parseFloat(document.getElementById('acier-longitudinal-chainage-couronnement').textContent) || 0;
+            const poidsAcierTransversal = parseFloat(document.getElementById('acier-transversal-chainage-couronnement').textContent) || 0;
+            const diametreLongitudinal = parseFloat(document.getElementById('diametre-longitudinal-chainage-couronnement').value) || 0;
+            const diametreTransversal = parseFloat(document.getElementById('diametre-transversal-chainage-couronnement').value) || 0;
+            
+            results.chainageCouronnement.ciment = ciment;
+            results.chainageCouronnement.sable = sable;
+            results.chainageCouronnement.gravier = gravier;
+            
+            if (diametreLongitudinal > 0) {
+                results.chainageCouronnement.acier[diametreLongitudinal] = (results.chainageCouronnement.acier[diametreLongitudinal] || 0) + poidsAcierLongitudinal;
+            }
+            
+            if (diametreTransversal > 0) {
+                results.chainageCouronnement.acier[diametreTransversal] = (results.chainageCouronnement.acier[diametreTransversal] || 0) + poidsAcierTransversal;
+            }
+        }
+        
+        function calculateChainageBas() {
+            const perimeter = parseFloat(document.getElementById('perimeter').value) || 0;
+            const largeurChainage = parseFloat(document.getElementById('largeur-chainage-bas').value) || 0;
+            const hauteurChainage = parseFloat(document.getElementById('hauteur-chainage-bas').value) || 0;
+            const dosage = parseFloat(document.getElementById('dosage-chainage-bas').value) || 0;
+            const diametreLongitudinal = parseFloat(document.getElementById('diametre-longitudinal-chainage-bas').value) || 0;
+            const nombreBarresLongitudinal = parseFloat(document.getElementById('nombre-barres-longitudinal-chainage-bas').value) || 0;
+            const diametreTransversal = parseFloat(document.getElementById('diametre-transversal-chainage-bas').value) || 0;
+            const espacementTransversal = parseFloat(document.getElementById('espacement-transversal-chainage-bas').value) || 0;
+            const longueurTransversal = parseFloat(document.getElementById('longueur-transversal-chainage-bas').value) || 0;
+            
+            const volume = perimeter * largeurChainage * hauteurChainage;
+            const ciment = volume * dosage;
+            const gravier = volume * 0.8; // 80% du volume
+            const sable = volume * 0.4; // 40% du volume
+            
+            // Calcul de l'acier longitudinal
+            const longueurAcierLongitudinal = nombreBarresLongitudinal * perimeter;
+            const poidsAcierLongitudinal = longueurAcierLongitudinal * (acierPoidsLineaire[diametreLongitudinal] || 0);
+            
+            // Calcul de l'acier transversal
+            const nombreBarresTransversal = Math.ceil(perimeter / espacementTransversal);
+            const longueurAcierTransversal = nombreBarresTransversal * longueurTransversal;
+            const poidsAcierTransversal = longueurAcierTransversal * (acierPoidsLineaire[diametreTransversal] || 0);
+            
+            document.getElementById('volume-chainage-bas').textContent = volume.toFixed(2) + ' m³';
+            document.getElementById('ciment-chainage-bas').textContent = ciment.toFixed(2) + ' kg';
+            document.getElementById('gravier-chainage-bas').textContent = gravier.toFixed(2) + ' m³';
+            document.getElementById('sable-chainage-bas').textContent = sable.toFixed(2) + ' m³';
+            document.getElementById('acier-longitudinal-chainage-bas').textContent = poidsAcierLongitudinal.toFixed(2) + ' kg';
+            document.getElementById('acier-transversal-chainage-bas').textContent = poidsAcierTransversal.toFixed(2) + ' kg';
+        }
+        
+        function saveChainageBasResults() {
+            const ciment = parseFloat(document.getElementById('ciment-chainage-bas').textContent) || 0;
+            const gravier = parseFloat(document.getElementById('gravier-chainage-bas').textContent) || 0;
+            const sable = parseFloat(document.getElementById('sable-chainage-bas').textContent) || 0;
+            const poidsAcierLongitudinal = parseFloat(document.getElementById('acier-longitudinal-chainage-bas').textContent) || 0;
+            const poidsAcierTransversal = parseFloat(document.getElementById('acier-transversal-chainage-bas').textContent) || 0;
+            const diametreLongitudinal = parseFloat(document.getElementById('diametre-longitudinal-chainage-bas').value) || 0;
+            const diametreTransversal = parseFloat(document.getElementById('diametre-transversal-chainage-bas').value) || 0;
+            
+            results.chainageBas.ciment = ciment;
+            results.chainageBas.sable = sable;
+            results.chainageBas.gravier = gravier;
+            
+            if (diametreLongitudinal > 0) {
+                results.chainageBas.acier[diametreLongitudinal] = (results.chainageBas.acier[diametreLongitudinal] || 0) + poidsAcierLongitudinal;
+            }
+            
+            if (diametreTransversal > 0) {
+                results.chainageBas.acier[diametreTransversal] = (results.chainageBas.acier[diametreTransversal] || 0) + poidsAcierTransversal;
+            }
+        }
+        
+        function calculateBriquePlein() {
+            const perimeter = parseFloat(document.getElementById('perimeter').value) || 0;
+            const hauteurMur = parseFloat(document.getElementById('hauteur-mur-soubassement').value) || 0;
+            
+            const surface = perimeter * hauteurMur;
+            const nombreBriques = surface * 12;
+            const masseCiment = (nombreBriques / 18) * 50;
+            const volumeSable = (masseCiment / 50) * 0.20;
+            
+            document.getElementById('surface-brique-plein').textContent = surface.toFixed(2) + ' m²';
+            document.getElementById('nombre-briques-plein').textContent = Math.ceil(nombreBriques);
+            document.getElementById('ciment-brique-plein').textContent = masseCiment.toFixed(2) + ' kg';
+            document.getElementById('sable-brique-plein').textContent = volumeSable.toFixed(2) + ' m³';
+        }
+        
+        function saveBriquePleinResults() {
+            const masseCiment = parseFloat(document.getElementById('ciment-brique-plein').textContent) || 0;
+            const volumeSable = parseFloat(document.getElementById('sable-brique-plein').textContent) || 0;
+            
+            results.briquePlein.ciment = masseCiment;
+            results.briquePlein.sable = volumeSable;
+        }
+        
+        function calculateBriqueCreuse() {
+            const perimeter = parseFloat(document.getElementById('perimeter').value) || 0;
+            const hauteurMur = parseFloat(document.getElementById('hauteur-mur-brique-creuse').value) || 0;
+            
+            const surface = perimeter * hauteurMur;
+            const nombreBriques = surface * 12;
+            const masseCiment = (nombreBriques / 28) * 50;
+            const volumeSable = (masseCiment / 50) * 0.20;
+            
+            document.getElementById('surface-brique-creuse').textContent = surface.toFixed(2) + ' m²';
+            document.getElementById('nombre-briques-creuse').textContent = Math.ceil(nombreBriques);
+            document.getElementById('ciment-brique-creuse').textContent = masseCiment.toFixed(2) + ' kg';
+            document.getElementById('sable-brique-creuse').textContent = volumeSable.toFixed(2) + ' m³';
+        }
+        
+        function saveBriqueCreuseResults() {
+            const masseCiment = parseFloat(document.getElementById('ciment-brique-creuse').textContent) || 0;
+            const volumeSable = parseFloat(document.getElementById('sable-brique-creuse').textContent) || 0;
+            
+            results.briqueCreuse.ciment = masseCiment;
+            results.briqueCreuse.sable = volumeSable;
+        }
+        
+        function calculateJointEnduit() {
+            const perimeter = parseFloat(document.getElementById('perimeter').value) || 0;
+            const hauteurMurSoubassement = parseFloat(document.getElementById('hauteur-mur-soubassement').value) || 0;
+            const hauteurMurBriqueCreuse = parseFloat(document.getElementById('hauteur-mur-brique-creuse').value) || 0;
+            const epaisseurEnduit = parseFloat(document.getElementById('epaisseur-enduit').value) || 0;
+            const dosage = parseFloat(document.getElementById('dosage-enduit').value) || 0;
+            
+            const surfaceMur = perimeter * (hauteurMurSoubassement + hauteurMurBriqueCreuse);
+            const volumeEnduit = surfaceMur * (epaisseurEnduit / 100); // Conversion cm en m
+            const masseCiment = volumeEnduit * dosage;
+            const volumeSable = volumeEnduit * 1.2; // 120% du volume
+            
+            document.getElementById('volume-enduit').textContent = volumeEnduit.toFixed(2) + ' m³';
+            document.getElementById('ciment-enduit').textContent = masseCiment.toFixed(2) + ' kg';
+            document.getElementById('sable-enduit').textContent = volumeSable.toFixed(2) + ' m³';
+        }
+        
+        function saveJointEnduitResults() {
+            const masseCiment = parseFloat(document.getElementById('ciment-enduit').textContent) || 0;
+            const volumeSable = parseFloat(document.getElementById('sable-enduit').textContent) || 0;
+            
+            results.jointEnduit.ciment = masseCiment;
+            results.jointEnduit.sable = volumeSable;
+        }
+        
+        function showResults() {
+            // Sauvegarder les résultats de l'écran actuel
+            saveCurrentScreenResults();
+            
+            // Passer à l'écran des résultats
+            screens[currentScreen].classList.remove('active');
+            currentScreen = screens.length - 1;
+            screens[currentScreen].classList.add('active');
+            
+            // Mettre à jour la barre de progression
+            updateProgressBar();
+            
+            // Calculer et afficher les résultats totaux
+            calculateTotalResults();
+            
+            // Faire défiler vers le haut
+            window.scrollTo(0, 0);
+            
+            // Afficher une notification
+            showNotification("Calculs terminés !");
+        }
+        
+        function calculateTotalResults() {
+            // Calculer les totaux
+            let totalCiment = 0;
+            let totalSable = 0;
+            let totalGravier = 0;
+            let totalAcier = 0;
+            let acierParDiametre = {};
+            
+            // Tableau des quantités par élément
+            const tableParElement = document.querySelector('#table-par-element tbody');
+            tableParElement.innerHTML = '';
+            
+            // Béton de propreté
+            totalCiment += results.betonProprete.ciment;
+            totalSable += results.betonProprete.sable;
+            totalGravier += results.betonProprete.gravier;
+            
+            const sacsBetonProprete = results.betonProprete.ciment / 50;
+            const tonnesBetonProprete = sacsBetonProprete / 20;
+            
+            const rowBetonProprete = document.createElement('tr');
+            rowBetonProprete.innerHTML = `
+                <td>Béton de propreté</td>
+                <td>${results.betonProprete.ciment.toFixed(2)}</td>
+                <td>${sacsBetonProprete.toFixed(2)}</td>
+                <td>${tonnesBetonProprete.toFixed(2)}</td>
+                <td>${results.betonProprete.sable.toFixed(2)}</td>
+                <td>${results.betonProprete.gravier.toFixed(2)}</td>
+                <td>0</td>
+                <td>0</td>
+            `;
+            tableParElement.appendChild(rowBetonProprete);
+            
+            // Semelle
+            totalCiment += results.semelle.ciment;
+            totalSable += results.semelle.sable;
+            totalGravier += results.semelle.gravier;
+            
+            let acierSemelle = 0;
+            for (const diametre in results.semelle.acier) {
+                acierSemelle += results.semelle.acier[diametre];
+                acierParDiametre[diametre] = (acierParDiametre[diametre] || 0) + results.semelle.acier[diametre];
+            }
+            totalAcier += acierSemelle;
+            
+            const sacsSemelle = results.semelle.ciment / 50;
+            const tonnesSemelle = sacsSemelle / 20;
+            const paquetsSemelle = acierSemelle / 100;
+            
+            const rowSemelle = document.createElement('tr');
+            rowSemelle.innerHTML = `
+                <td>Semelle filante</td>
+                <td>${results.semelle.ciment.toFixed(2)}</td>
+                <td>${sacsSemelle.toFixed(2)}</td>
+                <td>${tonnesSemelle.toFixed(2)}</td>
+                <td>${results.semelle.sable.toFixed(2)}</td>
+                <td>${results.semelle.gravier.toFixed(2)}</td>
+                <td>${acierSemelle.toFixed(2)}</td>
+                <td>${paquetsSemelle.toFixed(2)}</td>
+            `;
+            tableParElement.appendChild(rowSemelle);
+            
+            // Poteaux amorces
+            totalCiment += results.poteauxAmorces.ciment;
+            totalSable += results.poteauxAmorces.sable;
+            totalGravier += results.poteauxAmorces.gravier;
+            
+            let acierPoteauxAmorces = 0;
+            for (const diametre in results.poteauxAmorces.acier) {
+                acierPoteauxAmorces += results.poteauxAmorces.acier[diametre];
+                acierParDiametre[diametre] = (acierParDiametre[diametre] || 0) + results.poteauxAmorces.acier[diametre];
+            }
+            totalAcier += acierPoteauxAmorces;
+            
+            const sacsPoteauxAmorces = results.poteauxAmorces.ciment / 50;
+            const tonnesPoteauxAmorces = sacsPoteauxAmorces / 20;
+            const paquetsPoteauxAmorces = acierPoteauxAmorces / 100;
+            
+            const rowPoteauxAmorces = document.createElement('tr');
+            rowPoteauxAmorces.innerHTML = `
+                <td>Poteaux amorces</td>
+                <td>${results.poteauxAmorces.ciment.toFixed(2)}</td>
+                <td>${sacsPoteauxAmorces.toFixed(2)}</td>
+                <td>${tonnesPoteauxAmorces.toFixed(2)}</td>
+                <td>${results.poteauxAmorces.sable.toFixed(2)}</td>
+                <td>${results.poteauxAmorces.gravier.toFixed(2)}</td>
+                <td>${acierPoteauxAmorces.toFixed(2)}</td>
+                <td>${paquetsPoteauxAmorces.toFixed(2)}</td>
+            `;
+            tableParElement.appendChild(rowPoteauxAmorces);
+            
+            // Poteau en élévation
+            totalCiment += results.poteauElevation.ciment;
+            totalSable += results.poteauElevation.sable;
+            totalGravier += results.poteauElevation.gravier;
+            
+            let acierPoteauElevation = 0;
+            for (const diametre in results.poteauElevation.acier) {
+                acierPoteauElevation += results.poteauElevation.acier[diametre];
+                acierParDiametre[diametre] = (acierParDiametre[diametre] || 0) + results.poteauElevation.acier[diametre];
+            }
+            totalAcier += acierPoteauElevation;
+            
+            const sacsPoteauElevation = results.poteauElevation.ciment / 50;
+            const tonnesPoteauElevation = sacsPoteauElevation / 20;
+            const paquetsPoteauElevation = acierPoteauElevation / 100;
+            
+            const rowPoteauElevation = document.createElement('tr');
+            rowPoteauElevation.innerHTML = `
+                <td>Poteau en élévation</td>
+                <td>${results.poteauElevation.ciment.toFixed(2)}</td>
+                <td>${sacsPoteauElevation.toFixed(2)}</td>
+                <td>${tonnesPoteauElevation.toFixed(2)}</td>
+                <td>${results.poteauElevation.sable.toFixed(2)}</td>
+                <td>${results.poteauElevation.gravier.toFixed(2)}</td>
+                <td>${acierPoteauElevation.toFixed(2)}</td>
+                <td>${paquetsPoteauElevation.toFixed(2)}</td>
+            `;
+            tableParElement.appendChild(rowPoteauElevation);
+            
+            // Chainage de couronnement
+            totalCiment += results.chainageCouronnement.ciment;
+            totalSable += results.chainageCouronnement.sable;
+            totalGravier += results.chainageCouronnement.gravier;
+            
+            let acierChainageCouronnement = 0;
+            for (const diametre in results.chainageCouronnement.acier) {
+                acierChainageCouronnement += results.chainageCouronnement.acier[diametre];
+                acierParDiametre[diametre] = (acierParDiametre[diametre] || 0) + results.chainageCouronnement.acier[diametre];
+            }
+            totalAcier += acierChainageCouronnement;
+            
+            const sacsChainageCouronnement = results.chainageCouronnement.ciment / 50;
+            const tonnesChainageCouronnement = sacsChainageCouronnement / 20;
+            const paquetsChainageCouronnement = acierChainageCouronnement / 100;
+            
+            const rowChainageCouronnement = document.createElement('tr');
+            rowChainageCouronnement.innerHTML = `
+                <td>Chainage de couronnement</td>
+                <td>${results.chainageCouronnement.ciment.toFixed(2)}</td>
+                <td>${sacsChainageCouronnement.toFixed(2)}</td>
+                <td>${tonnesChainageCouronnement.toFixed(2)}</td>
+                <td>${results.chainageCouronnement.sable.toFixed(2)}</td>
+                <td>${results.chainageCouronnement.gravier.toFixed(2)}</td>
+                <td>${acierChainageCouronnement.toFixed(2)}</td>
+                <td>${paquetsChainageCouronnement.toFixed(2)}</td>
+            `;
+            tableParElement.appendChild(rowChainageCouronnement);
+            
+            // Chainage bas
+            totalCiment += results.chainageBas.ciment;
+            totalSable += results.chainageBas.sable;
+            totalGravier += results.chainageBas.gravier;
+            
+            let acierChainageBas = 0;
+            for (const diametre in results.chainageBas.acier) {
+                acierChainageBas += results.chainageBas.acier[diametre];
+                acierParDiametre[diametre] = (acierParDiametre[diametre] || 0) + results.chainageBas.acier[diametre];
+            }
+            totalAcier += acierChainageBas;
+            
+            const sacsChainageBas = results.chainageBas.ciment / 50;
+            const tonnesChainageBas = sacsChainageBas / 20;
+            const paquetsChainageBas = acierChainageBas / 100;
+            
+            const rowChainageBas = document.createElement('tr');
+            rowChainageBas.innerHTML = `
+                <td>Chainage bas</td>
+                <td>${results.chainageBas.ciment.toFixed(2)}</td>
+                <td>${sacsChainageBas.toFixed(2)}</td>
+                <td>${tonnesChainageBas.toFixed(2)}</td>
+                <td>${results.chainageBas.sable.toFixed(2)}</td>
+                <td>${results.chainageBas.gravier.toFixed(2)}</td>
+                <td>${acierChainageBas.toFixed(2)}</td>
+                <td>${paquetsChainageBas.toFixed(2)}</td>
+            `;
+            tableParElement.appendChild(rowChainageBas);
+            
+            // Brique plein
+            totalCiment += results.briquePlein.ciment;
+            totalSable += results.briquePlein.sable;
+            
+            const sacsBriquePlein = results.briquePlein.ciment / 50;
+            const tonnesBriquePlein = sacsBriquePlein / 20;
+            
+            const rowBriquePlein = document.createElement('tr');
+            rowBriquePlein.innerHTML = `
+                <td>Brique plein de 20x20x40</td>
+                <td>${results.briquePlein.ciment.toFixed(2)}</td>
+                <td>${sacsBriquePlein.toFixed(2)}</td>
+                <td>${tonnesBriquePlein.toFixed(2)}</td>
+                <td>${results.briquePlein.sable.toFixed(2)}</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            `;
+            tableParElement.appendChild(rowBriquePlein);
+            
+            // Brique creuse
+            totalCiment += results.briqueCreuse.ciment;
+            totalSable += results.briqueCreuse.sable;
+            
+            const sacsBriqueCreuse = results.briqueCreuse.ciment / 50;
+            const tonnesBriqueCreuse = sacsBriqueCreuse / 20;
+            
+            const rowBriqueCreuse = document.createElement('tr');
+            rowBriqueCreuse.innerHTML = `
+                <td>Brique creuse de 15x20x40</td>
+                <td>${results.briqueCreuse.ciment.toFixed(2)}</td>
+                <td>${sacsBriqueCreuse.toFixed(2)}</td>
+                <td>${tonnesBriqueCreuse.toFixed(2)}</td>
+                <td>${results.briqueCreuse.sable.toFixed(2)}</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            `;
+            tableParElement.appendChild(rowBriqueCreuse);
+            
+            // Joint et enduit
+            totalCiment += results.jointEnduit.ciment;
+            totalSable += results.jointEnduit.sable;
+            
+            const sacsJointEnduit = results.jointEnduit.ciment / 50;
+            const tonnesJointEnduit = sacsJointEnduit / 20;
+            
+            const rowJointEnduit = document.createElement('tr');
+            rowJointEnduit.innerHTML = `
+                <td>Joint et enduit</td>
+                <td>${results.jointEnduit.ciment.toFixed(2)}</td>
+                <td>${sacsJointEnduit.toFixed(2)}</td>
+                <td>${tonnesJointEnduit.toFixed(2)}</td>
+                <td>${results.jointEnduit.sable.toFixed(2)}</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            `;
+            tableParElement.appendChild(rowJointEnduit);
+            
+            // Calculer les totaux finaux
+            const totalSacs = totalCiment / 50;
+            const totalTonnes = totalSacs / 20;
+            const totalPaquets = totalAcier / 100;
+            
+            // Afficher les totaux dans les cartes
+            document.getElementById('ciment-total-value').textContent = totalCiment.toFixed(0);
+            document.getElementById('sacs-total-value').textContent = totalSacs.toFixed(1);
+            document.getElementById('tonnes-total-value').textContent = totalTonnes.toFixed(2);
+            document.getElementById('sable-total-value').textContent = totalSable.toFixed(1);
+            document.getElementById('gravier-total-value').textContent = totalGravier.toFixed(1);
+            document.getElementById('acier-total-value').textContent = totalAcier.toFixed(1);
+            document.getElementById('paquets-total-value').textContent = totalPaquets.toFixed(1);
+            
+            // Tableau de l'acier par diamètre
+            const tableAcierParDiametre = document.querySelector('#table-acier-par-diametre tbody');
+            tableAcierParDiametre.innerHTML = '';
+            
+            // Trier les diamètres
+            const diametres = Object.keys(acierParDiametre).sort((a, b) => parseInt(a) - parseInt(b));
+            
+            for (const diametre of diametres) {
+                const paquets = acierParDiametre[diametre] / 100;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${diametre}</td>
+                    <td>${acierParDiametre[diametre].toFixed(2)}</td>
+                    <td>${paquets.toFixed(2)}</td>
+                `;
+                tableAcierParDiametre.appendChild(row);
+            }
+        }
+        
+        function resetApp() {
+            // Réinitialiser les variables
+            currentScreen = 0;
+            
+            // Réinitialiser les résultats
+            results = {
+                betonProprete: {
+                    ciment: 0,
+                    sable: 0,
+                    gravier: 0,
+                    acier: {}
+                },
+                semelle: {
+                    ciment: 0,
+                    sable: 0,
+                    gravier: 0,
+                    acier: {}
+                },
+                poteauxAmorces: {
+                    ciment: 0,
+                    sable: 0,
+                    gravier: 0,
+                    acier: {}
+                },
+                poteauElevation: {
+                    ciment: 0,
+                    sable: 0,
+                    gravier: 0,
+                    acier: {}
+                },
+                chainageCouronnement: {
+                    ciment: 0,
+                    sable: 0,
+                    gravier: 0,
+                    acier: {}
+                },
+                chainageBas: {
+                    ciment: 0,
+                    sable: 0,
+                    gravier: 0,
+                    acier: {}
+                },
+                briquePlein: {
+                    ciment: 0,
+                    sable: 0
+                },
+                briqueCreuse: {
+                    ciment: 0,
+                    sable: 0
+                },
+                jointEnduit: {
+                    ciment: 0,
+                    sable: 0
+                }
+            };
+            
+            // Réinitialiser tous les champs de formulaire
+            document.querySelectorAll('input, select').forEach(element => {
+                if (element.type === 'number') {
+                    element.value = '';
+                } else if (element.tagName === 'SELECT') {
+                    element.selectedIndex = 0;
+                }
+            });
+            
+            // Réinitialiser tous les résultats affichés
+            document.querySelectorAll('.result-value').forEach(element => {
+                if (element.id.includes('volume')) {
+                    element.textContent = '0 m³';
+                } else if (element.id.includes('ciment') || element.id.includes('acier')) {
+                    element.textContent = '0 kg';
+                } else if (element.id.includes('sable') || element.id.includes('gravier')) {
+                    element.textContent = '0 m³';
+                } else if (element.id.includes('nombre') || element.id.includes('surface')) {
+                    element.textContent = '0';
+                }
+            });
+            
+            // Revenir au premier écran
+            screens.forEach(screen => screen.classList.remove('active'));
+            screens[0].classList.add('active');
+            
+            // Mettre à jour la barre de progression
+            updateProgressBar();
+            
+            // Faire défiler vers le haut
+            window.scrollTo(0, 0);
+            
+            // Afficher une notification
+            showNotification("Application réinitialisée !");
+        }
+        
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            const notificationMessage = document.getElementById('notification-message');
+            
+            notificationMessage.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ajouter des écouteurs d'événements pour les champs de saisie
+            document.querySelectorAll('input, select').forEach(element => {
+                element.addEventListener('input', function() {
+                    // Recalculer les résultats pour l'écran actuel
+                    calculateCurrentScreenResults();
+                });
+            });
+            
+            // Initialiser la barre de progression
+            updateProgressBar();
+        });
+    </script>
 </body>
 </html>
