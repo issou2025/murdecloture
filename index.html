@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculateur de Clôture</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         :root {
             --primary-color: #3498db;
@@ -35,16 +36,16 @@
         .container {
             max-width: 1000px;
             margin: 0 auto;
-            padding: 15px;
+            padding: 10px;
         }
 
         header {
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             color: white;
-            padding: 25px;
+            padding: 20px;
             text-align: center;
             border-radius: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             box-shadow: var(--card-shadow);
             position: relative;
             overflow: hidden;
@@ -62,8 +63,8 @@
         }
 
         header h1 {
-            margin-bottom: 10px;
-            font-size: 2rem;
+            margin-bottom: 8px;
+            font-size: 1.8rem;
             position: relative;
             z-index: 1;
         }
@@ -72,13 +73,14 @@
             position: relative;
             z-index: 1;
             opacity: 0.9;
+            font-size: 0.9rem;
         }
 
         .progress-container {
             background-color: #e0e0e0;
             border-radius: 10px;
-            margin-bottom: 20px;
-            height: 10px;
+            margin-bottom: 15px;
+            height: 8px;
             overflow: hidden;
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
         }
@@ -95,9 +97,9 @@
             display: none;
             background-color: white;
             border-radius: 15px;
-            padding: 25px;
+            padding: 20px;
             box-shadow: var(--card-shadow);
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             animation: fadeIn 0.5s ease;
         }
 
@@ -112,40 +114,40 @@
 
         .screen-title {
             color: var(--primary-color);
-            margin-bottom: 20px;
-            padding-bottom: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
             border-bottom: 2px solid var(--light-color);
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-size: 1.5rem;
+            gap: 10px;
+            font-size: 1.3rem;
         }
 
         .screen-title i {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: 600;
             color: var(--dark-color);
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
 
         input, select {
             width: 100%;
-            padding: 14px;
+            padding: 12px;
             border: 1px solid #ddd;
-            border-radius: 10px;
-            font-size: 16px;
+            border-radius: 8px;
+            font-size: 14px;
             transition: all 0.3s;
             background-color: #f9f9f9;
         }
@@ -153,23 +155,23 @@
         input:focus, select:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
             background-color: white;
         }
 
         .btn {
-            padding: 14px 24px;
+            padding: 12px 20px;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
             transition: all 0.3s;
             display: inline-flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             text-decoration: none;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
         }
 
         .btn-primary {
@@ -179,7 +181,7 @@
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
         }
 
         .btn-success {
@@ -189,7 +191,7 @@
 
         .btn-success:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
         }
 
         .btn-secondary {
@@ -199,29 +201,40 @@
 
         .btn-secondary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-export {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            color: white;
+        }
+
+        .btn-export:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
         }
 
         .btn-group {
             display: flex;
             justify-content: space-between;
-            margin-top: 25px;
-            gap: 15px;
+            margin-top: 20px;
+            gap: 10px;
         }
 
         .result-container {
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 20px;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
         }
 
         .result-item {
             display: flex;
             justify-content: space-between;
-            padding: 12px 0;
+            padding: 8px 0;
             border-bottom: 1px solid #e0e0e0;
+            font-size: 0.9rem;
         }
 
         .result-item:last-child {
@@ -241,14 +254,15 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
-            border-radius: 10px;
+            margin-top: 15px;
+            border-radius: 8px;
             overflow: hidden;
             box-shadow: var(--shadow);
+            font-size: 0.85rem;
         }
 
         th, td {
-            padding: 15px;
+            padding: 10px;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
@@ -257,6 +271,7 @@
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             color: white;
             font-weight: 600;
+            font-size: 0.8rem;
         }
 
         tr:nth-child(even) {
@@ -269,19 +284,20 @@
 
         .notification {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
+            top: 15px;
+            right: 15px;
+            padding: 12px 18px;
             background: linear-gradient(135deg, var(--success-color) 0%, #27ae60 100%);
             color: white;
-            border-radius: 10px;
+            border-radius: 8px;
             box-shadow: var(--card-shadow);
             transform: translateX(150%);
             transition: transform 0.3s ease;
             z-index: 1000;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            font-size: 0.9rem;
         }
 
         .notification.show {
@@ -294,47 +310,48 @@
 
         .icon-input i {
             position: absolute;
-            left: 14px;
+            left: 12px;
             top: 50%;
             transform: translateY(-50%);
             color: #95a5a6;
         }
 
         .icon-input input {
-            padding-left: 45px;
+            padding-left: 38px;
         }
 
         .summary-card {
             background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
             box-shadow: var(--card-shadow);
             transition: transform 0.3s ease;
         }
 
         .summary-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-3px);
         }
 
         .summary-card h3 {
             color: var(--primary-color);
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            font-size: 1.1rem;
         }
 
         .summary-card .value {
-            font-size: 2rem;
+            font-size: 1.5rem;
             font-weight: 700;
             color: var(--secondary-color);
-            margin: 10px 0;
+            margin: 8px 0;
         }
 
         .summary-card .unit {
             color: #7f8c8d;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         .mobile-table {
@@ -345,17 +362,17 @@
         /* Nouveaux styles pour les informations supplémentaires */
         .additional-info {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
         }
 
         .info-card {
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border-radius: 12px;
-            padding: 15px;
+            border-radius: 10px;
+            padding: 12px;
             text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
             cursor: pointer;
             text-decoration: none;
@@ -364,25 +381,26 @@
 
         .info-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
             background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
         }
 
         .info-card .icon {
-            font-size: 2rem;
+            font-size: 1.8rem;
             color: var(--primary-color);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .info-card .value {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 700;
             color: var(--secondary-color);
         }
 
         .info-card .label {
             color: #7f8c8d;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
+            margin-top: 4px;
         }
 
         /* Footer avec liens d'affiliation */
@@ -391,13 +409,13 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            background-color: rgba(255, 255, 255, 0.9);
+            background-color: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            padding: 10px 0;
+            padding: 8px 0;
             text-align: center;
-            font-size: 12px;
+            font-size: 11px;
             color: #6c757d;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
             z-index: 1000;
             border-top: 1px solid #e9ecef;
         }
@@ -405,23 +423,24 @@
         .footer-content {
             max-width: 1000px;
             margin: 0 auto;
-            padding: 0 15px;
+            padding: 0 10px;
             display: flex;
             justify-content: center;
             align-items: center;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
         }
 
         .footer-link {
             color: #6c757d;
             text-decoration: none;
-            padding: 5px 10px;
-            border-radius: 5px;
+            padding: 4px 8px;
+            border-radius: 4px;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
+            font-size: 10px;
         }
 
         .footer-link:hover {
@@ -431,108 +450,301 @@
 
         .footer-separator {
             color: #dee2e6;
-            margin: 0 5px;
+            margin: 0 3px;
         }
 
         .product-links {
             display: flex;
             justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
+            gap: 10px;
+            margin-top: 15px;
             flex-wrap: wrap;
         }
 
         .product-link {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 10px 15px;
+            gap: 6px;
+            padding: 8px 12px;
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border-radius: 10px;
+            border-radius: 8px;
             text-decoration: none;
             color: #495057;
-            font-size: 14px;
+            font-size: 12px;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            flex: 1;
+            min-width: 100px;
+            justify-content: center;
         }
 
         .product-link:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
             background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
             color: var(--primary-color);
         }
 
         .product-link i {
-            font-size: 16px;
+            font-size: 14px;
             color: var(--primary-color);
+        }
+
+        .product-name {
+            font-weight: 600;
+            font-size: 11px;
+        }
+
+        .product-brand {
+            font-size: 10px;
+            color: #6c757d;
+        }
+
+        /* Section produits recommandés */
+        .recommended-products {
+            margin-top: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .recommended-products h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        .product-card .icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .product-card .name {
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+            font-size: 1rem;
+        }
+
+        .product-card .brand {
+            color: #6c757d;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+        }
+
+        .product-card .description {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-bottom: 10px;
+            flex-grow: 1;
+        }
+
+        .product-card .price {
+            font-weight: 700;
+            color: var(--success-color);
+            font-size: 1.1rem;
+        }
+
+        .export-section {
+            margin-top: 20px;
+            text-align: center;
         }
 
         @media (max-width: 768px) {
             .container {
-                padding: 10px;
+                padding: 5px;
             }
             
             header h1 {
-                font-size: 1.5rem;
+                font-size: 1.4rem;
+            }
+            
+            header p {
+                font-size: 0.8rem;
             }
             
             .screen {
-                padding: 15px;
+                padding: 12px;
             }
             
             .btn-group {
                 flex-direction: column;
-                gap: 10px;
+                gap: 8px;
             }
             
             .btn {
                 width: 100%;
                 justify-content: center;
+                font-size: 13px;
+                padding: 10px 16px;
             }
             
             .screen-title {
-                font-size: 1.3rem;
+                font-size: 1.1rem;
             }
             
             .screen-title i {
-                font-size: 1.5rem;
+                font-size: 1.3rem;
             }
             
             table {
-                font-size: 0.9rem;
+                font-size: 0.75rem;
             }
             
             th, td {
-                padding: 10px;
+                padding: 8px;
             }
             
             .summary-card {
-                padding: 15px;
+                padding: 12px;
             }
             
             .summary-card .value {
-                font-size: 1.8rem;
+                font-size: 1.3rem;
             }
             
             .footer {
                 position: relative;
-                margin-top: 30px;
-                padding: 15px 0;
+                margin-top: 20px;
+                padding: 10px 0;
             }
             
             .footer-content {
                 flex-direction: column;
-                gap: 5px;
+                gap: 4px;
             }
             
             .product-links {
-                gap: 10px;
+                gap: 8px;
             }
             
             .product-link {
+                font-size: 11px;
+                padding: 6px 10px;
+                min-width: 80px;
+            }
+            
+            .additional-info {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 8px;
+            }
+            
+            .info-card {
+                padding: 10px;
+            }
+            
+            .info-card .icon {
+                font-size: 1.5rem;
+            }
+            
+            .info-card .value {
+                font-size: 1.1rem;
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 10px;
+            }
+            
+            .product-card {
+                padding: 12px;
+            }
+            
+            .product-card .icon {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 3px;
+            }
+            
+            header {
+                padding: 15px;
+            }
+            
+            header h1 {
+                font-size: 1.2rem;
+            }
+            
+            .screen {
+                padding: 10px;
+            }
+            
+            .form-group {
+                margin-bottom: 12px;
+            }
+            
+            label {
+                font-size: 0.85rem;
+            }
+            
+            input, select {
+                padding: 10px;
+                font-size: 13px;
+            }
+            
+            .btn {
                 font-size: 12px;
-                padding: 8px 12px;
+                padding: 8px 14px;
+            }
+            
+            .screen-title {
+                font-size: 1rem;
+            }
+            
+            .result-item {
+                font-size: 0.85rem;
+                padding: 6px 0;
+            }
+            
+            table {
+                font-size: 0.7rem;
+            }
+            
+            th, td {
+                padding: 6px;
+            }
+            
+            .additional-info {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            }
+            
+            .info-card .value {
+                font-size: 1rem;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -564,19 +776,39 @@
             
             <div class="product-links">
                 <a href="https://amzn.to/45PU83g" target="_blank" class="product-link">
-                    <i class="fas fa-cubes"></i> Ciment
+                    <i class="fas fa-cubes"></i>
+                    <div>
+                        <div class="product-name">Ciment Portland</div>
+                        <div class="product-brand">CEM I 42.5R</div>
+                    </div>
                 </a>
                 <a href="https://amzn.to/4m23uiJ" target="_blank" class="product-link">
-                    <i class="fas fa-mountain"></i> Sable
+                    <i class="fas fa-mountain"></i>
+                    <div>
+                        <div class="product-name">Sable de construction</div>
+                        <div class="product-brand">0/4 mm</div>
+                    </div>
                 </a>
                 <a href="https://amzn.to/4g1xn11" target="_blank" class="product-link">
-                    <i class="fas fa-gem"></i> Gravier
+                    <i class="fas fa-gem"></i>
+                    <div>
+                        <div class="product-name">Gravier concassé</div>
+                        <div class="product-brand">5/20 mm</div>
+                    </div>
                 </a>
                 <a href="https://amzn.to/4my4KuU" target="_blank" class="product-link">
-                    <i class="fas fa-dumbbell"></i> Acier
+                    <i class="fas fa-dumbbell"></i>
+                    <div>
+                        <div class="product-name">Acier à béton</div>
+                        <div class="product-brand">HA 500</div>
+                    </div>
                 </a>
                 <a href="https://amzn.to/3JoZ4Vv" target="_blank" class="product-link">
-                    <i class="fas fa-tools"></i> Outils
+                    <i class="fas fa-tools"></i>
+                    <div>
+                        <div class="product-name">Kit de maçonnerie</div>
+                        <div class="product-brand">Pro complet</div>
+                    </div>
                 </a>
             </div>
             
@@ -643,13 +875,25 @@
             
             <div class="product-links">
                 <a href="https://amzn.to/45PU83g" target="_blank" class="product-link">
-                    <i class="fas fa-cubes"></i> Ciment
+                    <i class="fas fa-cubes"></i>
+                    <div>
+                        <div class="product-name">Ciment Portland</div>
+                        <div class="product-brand">CEM I 42.5R</div>
+                    </div>
                 </a>
                 <a href="https://amzn.to/4m23uiJ" target="_blank" class="product-link">
-                    <i class="fas fa-mountain"></i> Sable
+                    <i class="fas fa-mountain"></i>
+                    <div>
+                        <div class="product-name">Sable de construction</div>
+                        <div class="product-brand">0/4 mm</div>
+                    </div>
                 </a>
                 <a href="https://amzn.to/4g1xn11" target="_blank" class="product-link">
-                    <i class="fas fa-gem"></i> Gravier
+                    <i class="fas fa-gem"></i>
+                    <div>
+                        <div class="product-name">Gravier concassé</div>
+                        <div class="product-brand">5/20 mm</div>
+                    </div>
                 </a>
             </div>
             
@@ -788,16 +1032,32 @@
             
             <div class="product-links">
                 <a href="https://amzn.to/45PU83g" target="_blank" class="product-link">
-                    <i class="fas fa-cubes"></i> Ciment
+                    <i class="fas fa-cubes"></i>
+                    <div>
+                        <div class="product-name">Ciment Portland</div>
+                        <div class="product-brand">CEM I 42.5R</div>
+                    </div>
                 </a>
                 <a href="https://amzn.to/4m23uiJ" target="_blank" class="product-link">
-                    <i class="fas fa-mountain"></i> Sable
+                    <i class="fas fa-mountain"></i>
+                    <div>
+                        <div class="product-name">Sable de construction</div>
+                        <div class="product-brand">0/4 mm</div>
+                    </div>
                 </a>
                 <a href="https://amzn.to/4g1xn11" target="_blank" class="product-link">
-                    <i class="fas fa-gem"></i> Gravier
+                    <i class="fas fa-gem"></i>
+                    <div>
+                        <div class="product-name">Gravier concassé</div>
+                        <div class="product-brand">5/20 mm</div>
+                    </div>
                 </a>
                 <a href="https://amzn.to/4my4KuU" target="_blank" class="product-link">
-                    <i class="fas fa-dumbbell"></i> Acier
+                    <i class="fas fa-dumbbell"></i>
+                    <div>
+                        <div class="product-name">Acier à béton</div>
+                        <div class="product-brand">HA 500</div>
+                    </div>
                 </a>
             </div>
             
@@ -952,16 +1212,32 @@
             
             <div class="product-links">
                 <a href="https://amzn.to/45PU83g" target="_blank" class="product-link">
-                    <i class="fas fa-cubes"></i> Ciment
+                    <i class="fas fa-cubes"></i>
+                    <div>
+                        <div class="product-name">Ciment Portland</div>
+                        <div class="product-brand">CEM I 42.5R</div>
+                    </div>
                 </a>
                 <a href="https://amzn.to/4m23uiJ" target="_blank" class="product-link">
-                    <i class="fas fa-mountain"></i> Sable
+                    <i class="fas fa-mountain"></i>
+                    <div>
+                        <div class="product-name">Sable de construction</div>
+                        <div class="product-brand">0/4 mm</div>
+                    </div>
                 </a>
                 <a href="https://amzn.to/4g1xn11" target="_blank" class="product-link">
-                    <i class="fas fa-gem"></i> Gravier
+                    <i class="fas fa-gem"></i>
+                    <div>
+                        <div class="product-name">Gravier concassé</div>
+                        <div class="product-brand">5/20 mm</div>
+                    </div>
                 </a>
                 <a href="https://amzn.to/4my4KuU" target="_blank" class="product-link">
-                    <i class="fas fa-dumbbell"></i> Acier
+                    <i class="fas fa-dumbbell"></i>
+                    <div>
+                        <div class="product-name">Acier à béton</div>
+                        <div class="product-brand">HA 500</div>
+                    </div>
                 </a>
             </div>
             
@@ -1116,16 +1392,32 @@
             
             <div class="product-links">
                 <a href="https://amzn.to/45PU83g" target="_blank" class="product-link">
-                    <i class="fas fa-cubes"></i> Ciment
+                    <i class="fas fa-cubes"></i>
+                    <div>
+                        <div class="product-name">Ciment Portland</div>
+                        <div class="product-brand">CEM I 42.5R</div>
+                    </div>
                 </a>
                 <a href="https://amzn.to/4m23uiJ" target="_blank" class="product-link">
-                    <i class="fas fa-mountain"></i> Sable
+                    <i class="fas fa-mountain"></i>
+                    <div>
+                        <div class="product-name">Sable de construction</div>
+                        <div class="product-brand">0/4 mm</div>
+                    </div>
                 </a>
                 <a href="https://amzn.to/4g1xn11" target="_blank" class="product-link">
-                    <i class="fas fa-gem"></i> Gravier
+                    <i class="fas fa-gem"></i>
+                    <div>
+                        <div class="product-name">Gravier concassé</div>
+                        <div class="product-brand">5/20 mm</div>
+                    </div>
                 </a>
                 <a href="https://amzn.to/4my4KuU" target="_blank" class="product-link">
-                    <i class="fas fa-dumbbell"></i> Acier
+                    <i class="fas fa-dumbbell"></i>
+                    <div>
+                        <div class="product-name">Acier à béton</div>
+                        <div class="product-brand">HA 500</div>
+                    </div>
                 </a>
             </div>
             
@@ -1264,16 +1556,32 @@
             
             <div class="product-links">
                 <a href="https://amzn.to/45PU83g" target="_blank" class="product-link">
-                    <i class="fas fa-cubes"></i> Ciment
+                    <i class="fas fa-cubes"></i>
+                    <div>
+                        <div class="product-name">Ciment Portland</div>
+                        <div class="product-brand">CEM I 42.5R</div>
+                    </div>
                 </a>
                 <a href="https://amzn.to/4m23uiJ" target="_blank" class="product-link">
-                    <i class="fas fa-mountain"></i> Sable
+                    <i class="fas fa-mountain"></i>
+                    <div>
+                        <div class="product-name">Sable de construction</div>
+                        <div class="product-brand">0/4 mm</div>
+                    </div>
                 </a>
                 <a href="https://amzn.to/4g1xn11" target="_blank" class="product-link">
-                    <i class="fas fa-gem"></i> Gravier
+                    <i class="fas fa-gem"></i>
+                    <div>
+                        <div class="product-name">Gravier concassé</div>
+                        <div class="product-brand">5/20 mm</div>
+                    </div>
                 </a>
                 <a href="https://amzn.to/4my4KuU" target="_blank" class="product-link">
-                    <i class="fas fa-dumbbell"></i> Acier
+                    <i class="fas fa-dumbbell"></i>
+                    <div>
+                        <div class="product-name">Acier à béton</div>
+                        <div class="product-brand">HA 500</div>
+                    </div>
                 </a>
             </div>
             
@@ -1412,16 +1720,32 @@
             
             <div class="product-links">
                 <a href="https://amzn.to/45PU83g" target="_blank" class="product-link">
-                    <i class="fas fa-cubes"></i> Ciment
+                    <i class="fas fa-cubes"></i>
+                    <div>
+                        <div class="product-name">Ciment Portland</div>
+                        <div class="product-brand">CEM I 42.5R</div>
+                    </div>
                 </a>
                 <a href="https://amzn.to/4m23uiJ" target="_blank" class="product-link">
-                    <i class="fas fa-mountain"></i> Sable
+                    <i class="fas fa-mountain"></i>
+                    <div>
+                        <div class="product-name">Sable de construction</div>
+                        <div class="product-brand">0/4 mm</div>
+                    </div>
                 </a>
                 <a href="https://amzn.to/4g1xn11" target="_blank" class="product-link">
-                    <i class="fas fa-gem"></i> Gravier
+                    <i class="fas fa-gem"></i>
+                    <div>
+                        <div class="product-name">Gravier concassé</div>
+                        <div class="product-brand">5/20 mm</div>
+                    </div>
                 </a>
                 <a href="https://amzn.to/4my4KuU" target="_blank" class="product-link">
-                    <i class="fas fa-dumbbell"></i> Acier
+                    <i class="fas fa-dumbbell"></i>
+                    <div>
+                        <div class="product-name">Acier à béton</div>
+                        <div class="product-brand">HA 500</div>
+                    </div>
                 </a>
             </div>
             
@@ -1468,13 +1792,25 @@
             
             <div class="product-links">
                 <a href="https://amzn.to/45PU83g" target="_blank" class="product-link">
-                    <i class="fas fa-cubes"></i> Ciment
+                    <i class="fas fa-cubes"></i>
+                    <div>
+                        <div class="product-name">Ciment Portland</div>
+                        <div class="product-brand">CEM I 42.5R</div>
+                    </div>
                 </a>
                 <a href="https://amzn.to/4m23uiJ" target="_blank" class="product-link">
-                    <i class="fas fa-mountain"></i> Sable
+                    <i class="fas fa-mountain"></i>
+                    <div>
+                        <div class="product-name">Sable de construction</div>
+                        <div class="product-brand">0/4 mm</div>
+                    </div>
                 </a>
                 <a href="https://amzn.to/4g1xn11" target="_blank" class="product-link">
-                    <i class="fas fa-gem"></i> Gravier
+                    <i class="fas fa-gem"></i>
+                    <div>
+                        <div class="product-name">Gravier concassé</div>
+                        <div class="product-brand">5/20 mm</div>
+                    </div>
                 </a>
             </div>
             
@@ -1521,13 +1857,25 @@
             
             <div class="product-links">
                 <a href="https://amzn.to/45PU83g" target="_blank" class="product-link">
-                    <i class="fas fa-cubes"></i> Ciment
+                    <i class="fas fa-cubes"></i>
+                    <div>
+                        <div class="product-name">Ciment Portland</div>
+                        <div class="product-brand">CEM I 42.5R</div>
+                    </div>
                 </a>
                 <a href="https://amzn.to/4m23uiJ" target="_blank" class="product-link">
-                    <i class="fas fa-mountain"></i> Sable
+                    <i class="fas fa-mountain"></i>
+                    <div>
+                        <div class="product-name">Sable de construction</div>
+                        <div class="product-brand">0/4 mm</div>
+                    </div>
                 </a>
                 <a href="https://amzn.to/4g1xn11" target="_blank" class="product-link">
-                    <i class="fas fa-gem"></i> Gravier
+                    <i class="fas fa-gem"></i>
+                    <div>
+                        <div class="product-name">Gravier concassé</div>
+                        <div class="product-brand">5/20 mm</div>
+                    </div>
                 </a>
             </div>
             
@@ -1585,13 +1933,25 @@
             
             <div class="product-links">
                 <a href="https://amzn.to/45PU83g" target="_blank" class="product-link">
-                    <i class="fas fa-cubes"></i> Ciment
+                    <i class="fas fa-cubes"></i>
+                    <div>
+                        <div class="product-name">Ciment Portland</div>
+                        <div class="product-brand">CEM I 42.5R</div>
+                    </div>
                 </a>
                 <a href="https://amzn.to/4m23uiJ" target="_blank" class="product-link">
-                    <i class="fas fa-mountain"></i> Sable
+                    <i class="fas fa-mountain"></i>
+                    <div>
+                        <div class="product-name">Sable de construction</div>
+                        <div class="product-brand">0/4 mm</div>
+                    </div>
                 </a>
                 <a href="https://amzn.to/3JoZ4Vv" target="_blank" class="product-link">
-                    <i class="fas fa-tools"></i> Outils
+                    <i class="fas fa-tools"></i>
+                    <div>
+                        <div class="product-name">Kit de maçonnerie</div>
+                        <div class="product-brand">Pro complet</div>
+                    </div>
                 </a>
             </div>
             
@@ -1630,7 +1990,7 @@
                 </table>
             </div>
             
-            <h3 style="margin-top: 30px;">Quantités totales</h3>
+            <h3 style="margin-top: 20px;">Quantités totales</h3>
             <div class="additional-info">
                 <div class="info-card">
                     <div class="icon"><i class="fas fa-cubes"></i></div>
@@ -1669,7 +2029,7 @@
                 </div>
             </div>
             
-            <h3 style="margin-top: 30px;">Détail de l'acier par diamètre</h3>
+            <h3 style="margin-top: 20px;">Détail de l'acier par diamètre</h3>
             <div class="mobile-table">
                 <table id="table-acier-par-diametre">
                     <thead>
@@ -1685,33 +2045,51 @@
                 </table>
             </div>
             
-            <h3 style="margin-top: 30px;">Produits recommandés pour votre projet</h3>
-            <div class="additional-info">
-                <a href="https://amzn.to/45PU83g" target="_blank" class="info-card">
-                    <div class="icon"><i class="fas fa-cubes"></i></div>
-                    <div class="value">Ciment</div>
-                    <div class="label">Voir sur Amazon</div>
-                </a>
-                <a href="https://amzn.to/4m23uiJ" target="_blank" class="info-card">
-                    <div class="icon"><i class="fas fa-mountain"></i></div>
-                    <div class="value">Sable</div>
-                    <div class="label">Voir sur Amazon</div>
-                </a>
-                <a href="https://amzn.to/4g1xn11" target="_blank" class="info-card">
-                    <div class="icon"><i class="fas fa-gem"></i></div>
-                    <div class="value">Gravier</div>
-                    <div class="label">Voir sur Amazon</div>
-                </a>
-                <a href="https://amzn.to/4my4KuU" target="_blank" class="info-card">
-                    <div class="icon"><i class="fas fa-dumbbell"></i></div>
-                    <div class="value">Acier</div>
-                    <div class="label">Voir sur Amazon</div>
-                </a>
-                <a href="https://amzn.to/3JoZ4Vv" target="_blank" class="info-card">
-                    <div class="icon"><i class="fas fa-tools"></i></div>
-                    <div class="value">Outils</div>
-                    <div class="label">Voir sur Amazon</div>
-                </a>
+            <div class="recommended-products">
+                <h3>Produits recommandés pour votre projet</h3>
+                <div class="products-grid">
+                    <a href="https://amzn.to/45PU83g" target="_blank" class="product-card">
+                        <div class="icon"><i class="fas fa-cubes"></i></div>
+                        <div class="name">Ciment Portland</div>
+                        <div class="brand">CEM I 42.5R</div>
+                        <div class="description">Ciment de haute qualité pour tous vos travaux de maçonnerie</div>
+                        <div class="price">À partir de 8.99€</div>
+                    </a>
+                    <a href="https://amzn.to/4m23uiJ" target="_blank" class="product-card">
+                        <div class="icon"><i class="fas fa-mountain"></i></div>
+                        <div class="name">Sable de construction</div>
+                        <div class="brand">0/4 mm</div>
+                        <div class="description">Sable lavé pour béton et enduit</div>
+                        <div class="price">À partir de 35.99€</div>
+                    </a>
+                    <a href="https://amzn.to/4g1xn11" target="_blank" class="product-card">
+                        <div class="icon"><i class="fas fa-gem"></i></div>
+                        <div class="name">Gravier concassé</div>
+                        <div class="brand">5/20 mm</div>
+                        <div class="description">Gravier pour béton et drainage</div>
+                        <div class="price">À partir de 42.99€</div>
+                    </a>
+                    <a href="https://amzn.to/4my4KuU" target="_blank" class="product-card">
+                        <div class="icon"><i class="fas fa-dumbbell"></i></div>
+                        <div class="name">Acier à béton</div>
+                        <div class="brand">HA 500</div>
+                        <div class="description">Acier haute adhérence pour béton armé</div>
+                        <div class="price">À partir de 12.99€</div>
+                    </a>
+                    <a href="https://amzn.to/3JoZ4Vv" target="_blank" class="product-card">
+                        <div class="icon"><i class="fas fa-tools"></i></div>
+                        <div class="name">Kit de maçonnerie</div>
+                        <div class="brand">Pro complet</div>
+                        <div class="description">Outils essentiels pour vos travaux</div>
+                        <div class="price">À partir de 89.99€</div>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="export-section">
+                <button class="btn btn-export" onclick="exportToPDF()">
+                    <i class="fas fa-file-pdf"></i> Exporter en PDF
+                </button>
             </div>
             
             <div class="btn-group">
@@ -1733,7 +2111,7 @@
     <footer class="footer">
         <div class="footer-content">
             <a href="https://amzn.to/45PU83g" target="_blank" class="footer-link">
-                <i class="fas fa-cubes"></i> Ciment
+                <i class="fas fa-cubes"></i> Ciment Portland
             </a>
             <span class="footer-separator">|</span>
             <a href="https://amzn.to/4m23uiJ" target="_blank" class="footer-link">
@@ -2598,6 +2976,148 @@
                 `;
                 tableAcierParDiametre.appendChild(row);
             }
+        }
+        
+        function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Ajouter un titre
+            doc.setFontSize(18);
+            doc.text('Rapport de calcul de clôture', 105, 15, { align: 'center' });
+            
+            // Date du rapport
+            doc.setFontSize(10);
+            const date = new Date().toLocaleDateString('fr-FR');
+            doc.text(`Date: ${date}`, 105, 25, { align: 'center' });
+            
+            // Tableau des quantités par élément
+            doc.setFontSize(14);
+            doc.text('Quantités par élément', 20, 40);
+            
+            const tableData = [];
+            const headers = ['Élément', 'Ciment (kg)', 'Sacs (50kg)', 'Tonnes', 'Sable (m³)', 'Gravier (m³)', 'Acier (kg)', 'Paquets (100kg)'];
+            
+            // Récupérer les données du tableau
+            const tableRows = document.querySelectorAll('#table-par-element tbody tr');
+            tableRows.forEach(row => {
+                const rowData = [];
+                row.querySelectorAll('td').forEach(cell => {
+                    rowData.push(cell.textContent);
+                });
+                tableData.push(rowData);
+            });
+            
+            // Ajouter le tableau au PDF
+            doc.autoTable({
+                head: [headers],
+                body: tableData,
+                startY: 50,
+                theme: 'grid',
+                styles: {
+                    fontSize: 8,
+                    cellPadding: 3
+                },
+                headStyles: {
+                    fillColor: [52, 152, 219],
+                    textColor: 255
+                }
+            });
+            
+            // Quantités totales
+            const finalY = doc.lastAutoTable.finalY + 20;
+            doc.setFontSize(14);
+            doc.text('Quantités totales', 20, finalY);
+            
+            // Récupérer les totaux
+            const totalCiment = document.getElementById('ciment-total-value').textContent;
+            const totalSacs = document.getElementById('sacs-total-value').textContent;
+            const totalTonnes = document.getElementById('tonnes-total-value').textContent;
+            const totalSable = document.getElementById('sable-total-value').textContent;
+            const totalGravier = document.getElementById('gravier-total-value').textContent;
+            const totalAcier = document.getElementById('acier-total-value').textContent;
+            const totalPaquets = document.getElementById('paquets-total-value').textContent;
+            
+            // Tableau des totaux
+            const totalsData = [
+                ['Ciment (kg)', totalCiment],
+                ['Sacs (50kg)', totalSacs],
+                ['Tonnes', totalTonnes],
+                ['Sable (m³)', totalSable],
+                ['Gravier (m³)', totalGravier],
+                ['Acier (kg)', totalAcier],
+                ['Paquets (100kg)', totalPaquets]
+            ];
+            
+            doc.autoTable({
+                head: [['Matériau', 'Quantité']],
+                body: totalsData,
+                startY: finalY + 10,
+                theme: 'grid',
+                styles: {
+                    fontSize: 10,
+                    cellPadding: 3
+                },
+                headStyles: {
+                    fillColor: [52, 152, 219],
+                    textColor: 255
+                }
+            });
+            
+            // Détail de l'acier par diamètre
+            const acierY = doc.lastAutoTable.finalY + 20;
+            doc.setFontSize(14);
+            doc.text('Détail de l\'acier par diamètre', 20, acierY);
+            
+            // Récupérer les données d'acier
+            const acierData = [];
+            const acierRows = document.querySelectorAll('#table-acier-par-diametre tbody tr');
+            acierRows.forEach(row => {
+                const rowData = [];
+                row.querySelectorAll('td').forEach(cell => {
+                    rowData.push(cell.textContent);
+                });
+                acierData.push(rowData);
+            });
+            
+            doc.autoTable({
+                head: [['Diamètre (mm)', 'Poids (kg)', 'Paquets (100kg)']],
+                body: acierData,
+                startY: acierY + 10,
+                theme: 'grid',
+                styles: {
+                    fontSize: 10,
+                    cellPadding: 3
+                },
+                headStyles: {
+                    fillColor: [52, 152, 219],
+                    textColor: 255
+                }
+            });
+            
+            // Produits recommandés
+            const productsY = doc.lastAutoTable.finalY + 20;
+            doc.setFontSize(14);
+            doc.text('Produits recommandés', 20, productsY);
+            
+            const products = [
+                { name: 'Ciment Portland CEM I 42.5R', url: 'https://amzn.to/45PU83g' },
+                { name: 'Sable de construction 0/4 mm', url: 'https://amzn.to/4m23uiJ' },
+                { name: 'Gravier concassé 5/20 mm', url: 'https://amzn.to/4g1xn11' },
+                { name: 'Acier à béton HA 500', url: 'https://amzn.to/4my4KuU' },
+                { name: 'Kit de maçonnerie Pro complet', url: 'https://amzn.to/3JoZ4Vv' }
+            ];
+            
+            products.forEach((product, index) => {
+                doc.setFontSize(10);
+                doc.text(`${index + 1}. ${product.name}`, 25, productsY + 15 + (index * 8));
+            });
+            
+            // Sauvegarder le PDF
+            doc.save('rapport_calcul_cloture.pdf');
+            
+            // Afficher une notification
+            showNotification("PDF exporté avec succès !");
         }
         
         function resetApp() {
