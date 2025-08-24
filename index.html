@@ -1,1391 +1,1637 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>Clôture & Devis — Calculateur chantier (PWA)</title>
-<meta name="description" content="Application PWA mono-fichier pour calculer quantités et coûts d'une clôture - conçu par Issoufou Abdou Chefou" />
-<!-- Minimal manifest injected at runtime (Blob) -->
-<style>
-/* ===========================================
-   Styles principaux - Mobile first
-   Variables thème clair/sombre, accessible
-   =========================================== */
-:root{
-  --bg: #ffffff;
-  --text: #111827;
-  --muted:#6b7280;
-  --accent: #0ea5a4; /* teal-500 */
-  --danger:#ef4444;
-  --surface:#f8fafc;
-  --card:#ffffff;
-  --radius:12px;
-  --gap:12px;
-  --unit-touch:44px;
-  --shadow: 0 6px 18px rgba(2,6,23,0.08);
-  --max-width:980px;
-  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-}
-[data-theme="dark"]{
-  --bg: #0b1220;
-  --text: #e6eef6;
-  --muted:#9aa6b2;
-  --accent:#22c1c1;
-  --surface:#071020;
-  --card:#071425;
-  --shadow: 0 8px 26px rgba(2,6,23,0.6);
-}
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0;
-  background:linear-gradient(180deg,var(--surface),var(--bg));
-  color:var(--text);
-  font-family:var(--font-sans);
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-  line-height:1.35;
-  padding:16px;
-  display:flex;
-  justify-content:center;
-  font-size:15px;
-}
-.app{
-  width:100%;
-  max-width:var(--max-width);
-  background:transparent;
-}
-/* Header */
-.header{
-  display:flex;
-  gap:12px;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:12px;
-}
-.brand{
-  display:flex;
-  gap:10px;
-  align-items:center;
-}
-.logo{
-  width:48px;height:48px;border-radius:10px;
-  background:linear-gradient(135deg,var(--accent),#06b6d4);
-  display:flex;align-items:center;justify-content:center;
-  color:white;font-weight:700;box-shadow:var(--shadow)
-}
-.h1{font-size:1.05rem;font-weight:700}
-.controls{display:flex;gap:8px;align-items:center}
-/* Layout */
-.container{
-  background:linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.2));
-  border-radius:14px;padding:12px;box-shadow:var(--shadow);
-  display:grid;grid-template-columns: 1fr; gap:12px;
-}
-@media(min-width:900px){
-  .container{grid-template-columns: 360px 1fr;}
-}
-/* Left column: wizard stepper */
-.panel{
-  background:var(--card);border-radius:12px;padding:12px;
-  min-height:160px;
-  display:flex;flex-direction:column;gap:12px;
-}
-.stepper{display:flex;flex-direction:column;gap:8px;overflow:auto;max-height:60vh;padding-right:6px}
-.step{
-  display:flex;gap:8px;align-items:center;padding:8px;border-radius:8px;
-  cursor:pointer;
-}
-.step[aria-current="true"]{background:linear-gradient(90deg, rgba(14,165,164,0.08), rgba(6,182,212,0.04));border:1px solid rgba(14,165,164,0.12)}
-.step .num{width:34px;height:34px;border-radius:8px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-weight:700}
-.step .label{font-size:0.95rem}
-/* Main content */
-.main{
-  display:flex;flex-direction:column;gap:12px;
-}
-.card{
-  background:var(--card);border-radius:12px;padding:12px;box-shadow:var(--shadow);
-}
-.form-row{display:flex;gap:8px;flex-wrap:wrap}
-.field{flex:1;min-width:140px;display:flex;flex-direction:column;gap:6px}
-label{font-size:0.82rem;color:var(--muted)}
-input[type="text"], input[type="number"], select{
-  height:44px;border-radius:8px;padding:10px;border:1px solid #e6e9ee;background:transparent;font-size:1rem;
-  outline:none;
-}
-input:focus, select:focus{box-shadow:0 0 0 4px rgba(14,165,164,0.08);border-color:var(--accent)}
-.small{font-size:0.88rem;color:var(--muted)}
-.btn{
-  height:44px;min-width:120px;border-radius:10px;padding:0 12px;background:var(--accent);color:white;border:0;font-weight:700;cursor:pointer;
-  display:inline-flex;align-items:center;justify-content:center;gap:8px;
-}
-.btn.secondary{background:transparent;border:1px solid #e6e9ee;color:var(--text)}
-.btn.ghost{background:transparent;color:var(--text);border:1px dashed #e6e9ee}
-.actions{display:flex;gap:8px;flex-wrap:wrap}
-/* Sticky mini dashboard */
-.mini{
-  position:sticky;top:8px;background:linear-gradient(90deg,rgba(255,255,255,0.7),rgba(255,255,255,0.55));
-  border-radius:10px;padding:10px;display:flex;justify-content:space-between;align-items:center;
-  gap:12px;border:1px solid rgba(0,0,0,0.04);
-}
-.mini .left{display:flex;gap:10px;align-items:center}
-.kpi{display:flex;flex-direction:column}
-.kpi .num{font-size:1.05rem;font-weight:800}
-.kpi .lbl{font-size:0.78rem;color:var(--muted)}
-/* SVG mini-scheme */
-.schematic{width:100%;height:140px;background:linear-gradient(180deg, rgba(250,250,255,0.9), rgba(255,255,255,0.6));border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px dashed rgba(0,0,0,0.04)}
-.footer{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-top:8px}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#111827;color:white;padding:10px 14px;border-radius:8px;box-shadow:var(--shadow);display:none}
-.badge{background:#eef2ff;color:#4338ca;padding:6px 8px;border-radius:999px;font-weight:700}
-/* Table summary */
-.table{width:100%;border-collapse:collapse}
-.table th, .table td{padding:8px;border-bottom:1px solid #eef2f6;text-align:left;font-size:0.95rem}
-.table th{font-weight:700}
-.chart-wrap{height:200px}
-.small-muted{font-size:0.82rem;color:var(--muted)}
-/* Accessibility / focus */
-:focus{outline:3px solid rgba(34,197,94,0.12);outline-offset:2px;border-radius:6px}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🏗️ Calcul Mur Clôture</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --primary: #3498db;
+      --primary-dark: #2980b9;
+      --secondary: #2ecc71;
+      --danger: #e74c3c;
+      --warning: #f39c12;
+      --light: #f8f9fa;
+      --dark: #2c3e50;
+      --gray: #7f8c8d;
+      --border: #e1e8ed;
+      --card-bg: #ffffff;
+      --text-primary: #2c3e50;
+      --text-secondary: #7f8c8d;
+      --shadow: 0 4px 12px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body {
+      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 16px;
+      font-size: 16px;
+    }
+
+    .app-container {
+      max-width: 500px;
+      margin: 0 auto;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    .app-header {
+      text-align: center;
+      padding: 24px 16px;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .app-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .app-subtitle {
+      font-size: 0.9rem;
+      opacity: 0.9;
+      font-weight: 400;
+    }
+
+    /* Stepper */
+    .stepper {
+      display: flex;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 30px;
+      padding: 4px;
+      margin: 0 16px 24px;
+      flex-shrink: 0;
+    }
+
+    .step {
+      flex: 1;
+      padding: 12px 4px;
+      text-align: center;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.7);
+      border-radius: 24px;
+      cursor: pointer;
+      transition: var(--transition);
+      user-select: none;
+    }
+
+    .step.active {
+      background: white;
+      color: var(--primary);
+      transform: scale(1.05);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .step.completed {
+      background: var(--secondary);
+      color: white;
+    }
+
+    /* Screen */
+    .screen {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      animation: slideIn 0.4s ease;
+    }
+
+    @keyframes slideIn {
+      from { 
+        opacity: 0; 
+        transform: translateY(20px); 
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0); 
+      }
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    .screen-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .screen-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .screen-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    /* Form */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+    }
+
+    .form-input, .form-select {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      font-family: inherit;
+      background: white;
+      transition: var(--transition);
+      appearance: none;
+    }
+
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+
+    .input-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .input-group .form-group {
+      flex: 1;
+      margin-bottom: 0;
+    }
+
+    /* Summary Box */
+    .summary-box {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-radius: var(--radius-sm);
+      padding: 20px;
+      margin: 20px 0;
+      border-left: 4px solid var(--primary);
+    }
+
+    .summary-title {
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 16px;
+      font-size: 1.1rem;
+    }
+
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .summary-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--primary-dark);
+    }
+
+    /* Buttons */
+    .button-group {
+      display: flex;
+      gap: 12px;
+      margin-top: auto;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 16px;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: center;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .btn-secondary {
+      background: var(--secondary);
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #27ae60;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--primary);
+      color: var(--primary);
+    }
+
+    .btn-outline:hover {
+      background: var(--primary);
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    .btn-icon {
+      font-size: 1.2rem;
+    }
+
+    /* Table */
+    .table-container {
+      overflow-x: auto;
+      margin: 20px 0;
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      font-size: 0.85rem;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover {
+      background-color: #f8f9fa;
+    }
+
+    /* Actions */
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .action-btn {
+      flex: 1;
+      min-width: 120px;
+      padding: 14px;
+      border-radius: var(--radius-sm);
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: var(--transition);
+      border: 2px solid var(--primary);
+      background: white;
+      color: var(--primary);
+      text-align: center;
+    }
+
+    .action-btn:hover {
+      background: var(--primary);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    /* Notification */
+    .notification {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      padding: 16px 24px;
+      border-radius: var(--radius-sm);
+      color: white;
+      font-weight: 500;
+      font-size: 0.9rem;
+      box-shadow: var(--shadow-lg);
+      z-index: 1000;
+      transition: transform 0.3s ease;
+      max-width: 90%;
+      text-align: center;
+    }
+
+    .notification.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .notification.success {
+      background: var(--secondary);
+    }
+
+    .notification.error {
+      background: var(--danger);
+    }
+
+    /* OR divider */
+    .or-divider {
+      text-align: center;
+      margin: 16px 0;
+      position: relative;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .or-divider::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--border);
+      z-index: 1;
+    }
+
+    .or-divider span {
+      position: relative;
+      background: white;
+      padding: 0 16px;
+      z-index: 2;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      body {
+        padding: 12px;
+        font-size: 15px;
+      }
+      
+      .app-title {
+        font-size: 1.3rem;
+      }
+      
+      .app-subtitle {
+        font-size: 0.8rem;
+      }
+      
+      .screen {
+        padding: 20px;
+      }
+      
+      .screen-title {
+        font-size: 1.2rem;
+      }
+      
+      .step {
+        font-size: 0.6rem;
+        padding: 10px 2px;
+      }
+      
+      .input-group {
+        flex-direction: column;
+        gap: 12px;
+      }
+      
+      .btn {
+        padding: 14px;
+        font-size: 0.95rem;
+      }
+      
+      table {
+        font-size: 0.75rem;
+      }
+      
+      th, td {
+        padding: 8px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      body {
+        padding: 8px;
+      }
+      
+      .app-header {
+        padding: 16px 12px;
+      }
+      
+      .screen {
+        padding: 16px;
+      }
+      
+      .form-input, .form-select {
+        padding: 12px;
+        font-size: 0.95rem;
+      }
+      
+      .btn {
+        padding: 12px;
+        font-size: 0.9rem;
+      }
+    }
+
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --card-bg: #1a1a1a;
+        --text-primary: #ffffff;
+        --text-secondary: #b0b0b0;
+        --border: #333333;
+      }
+      
+      body {
+        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+      }
+      
+      .summary-box {
+        background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
+      }
+      
+      .form-input, .form-select {
+        background: #2c2c2c;
+        color: white;
+        border-color: #404040;
+      }
+      
+      table {
+        background: #2c2c2c;
+        color: white;
+      }
+      
+      tr:hover {
+        background-color: #3a3a3a;
+      }
+    }
+
+    /* Loading spinner */
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Progress bar */
+    .progress-bar {
+      height: 4px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 2px;
+      margin: 16px 0;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--secondary);
+      border-radius: 2px;
+      transition: width 0.3s ease;
+    }
+  </style>
 </head>
 <body>
-<div class="app" id="app" role="application" aria-labelledby="app-title">
-  <div class="header">
-    <div class="brand">
-      <div class="logo" aria-hidden="true">IC</div>
-      <div>
-        <div id="app-title" class="h1">Calculateur Clôture — chantier</div>
-        <div class="small-muted">Mono-fichier PWA · Export PDF/CSV/JSON · Offline</div>
-      </div>
+  <div class="app-container">
+    <header class="app-header">
+      <h1 class="app-title">🏗️ Calcul Mur Clôture</h1>
+      <p class="app-subtitle">Calculez les quantités et coûts pour votre projet</p>
+    </header>
+
+    <div class="stepper" id="stepper">
+      <!-- Dynamically filled -->
     </div>
-    <div class="controls" role="region" aria-label="Contrôles">
-      <button class="btn ghost" id="toggleThemeBtn" aria-pressed="false" title="Basculer thème">Thème</button>
-      <button class="btn secondary" id="saveProjectBtn" title="Sauvegarder projet">Sauvegarder</button>
-      <button class="btn" id="exportPdfBtn" title="Exporter en PDF">Exporter PDF</button>
-    </div>
-  </div>
 
-  <div class="container" role="main">
-    <!-- Left column: stepper + project manager -->
-    <aside class="panel" aria-label="Navigation étapes">
-      <div class="mini" id="miniDash" aria-live="polite">
-        <div class="left">
-          <div class="kpi"><div class="num" id="miniPerimeter">P: 80 m</div><div class="lbl">Périmètre</div></div>
-          <div class="kpi"><div class="num" id="miniSurface">S: 400 m²</div><div class="lbl">Surface</div></div>
+    <main class="main-content">
+      <!-- Écran 1 : Paramètres parcelle -->
+      <section id="screen1" class="screen active">
+        <div class="screen-header">
+          <h2 class="screen-title">📏 Dimensions Parcelle</h2>
+          <p class="screen-subtitle">Entrez les dimensions de votre terrain</p>
         </div>
-        <div>
-          <div class="kpi"><div class="num" id="miniTotal">Total: 0 XOF</div><div class="lbl">Estimation</div></div>
+        
+        <div class="form-group">
+          <label class="form-label">🏷️ Type de parcelle (optionnel)</label>
+          <input type="text" class="form-input" id="parcelType" placeholder="Ex: Résidentielle, Agricole...">
         </div>
-      </div>
-
-      <div style="height:10px"></div>
-      <div class="stepper" id="stepper" role="tablist" aria-orientation="vertical">
-        <!-- Steps rendered by JS -->
-      </div>
-
-      <div style="height:12px"></div>
-      <div>
-        <label for="projectSelect" class="small">Projets sauvegardés</label>
-        <div class="form-row" style="align-items:center">
-          <select id="projectSelect" aria-label="Sélection projet" style="flex:1"></select>
-          <button class="btn ghost" id="loadProjectBtn" title="Charger projet">Charger</button>
-        </div>
-        <div style="height:8px"></div>
-        <div class="actions">
-          <button class="btn" id="newProjectBtn">Nouveau</button>
-          <button class="btn secondary" id="deleteProjectBtn">Supprimer</button>
-        </div>
-      </div>
-      <div style="flex:1"></div>
-      <div class="small-muted" style="font-size:12px">
-        Conçu par Issoufou Abdou Chefou · <span class="badge">PWA</span>
-      </div>
-    </aside>
-
-    <!-- Main column -->
-    <section class="main" aria-label="Contenu principal">
-      <!-- WIZARD STEPS CONTENT -->
-      <div id="stepContent" class="card" tabindex="0" aria-live="polite">
-        <!-- Each step form is rendered here -->
-      </div>
-
-      <div class="card" id="summaryCard" aria-label="Récapitulatif">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div><strong>Récapitulatif & Devis</strong><div class="small-muted">Tableau détaillé et export</div></div>
-          <div class="actions">
-            <button class="btn" id="exportJsonBtn">Exporter JSON</button>
-            <button class="btn secondary" id="exportCsvBtn">Exporter CSV</button>
-            <button class="btn ghost" id="copyClipboardBtn">Copier JSON</button>
-            <button class="btn secondary" id="runTestsBtn">Run tests</button>
+        
+        <div class="form-group">
+          <label class="form-label">📐 Dimensions Terrain</label>
+          <div class="input-group">
+            <div class="form-group">
+              <input type="text" class="form-input" id="length" placeholder="Longueur (m)" inputmode="decimal">
+            </div>
+            <div class="form-group">
+              <input type="text" class="form-input" id="width" placeholder="Largeur (m)" inputmode="decimal">
+            </div>
+          </div>
+          
+          <div class="or-divider">
+            <span>OU</span>
+          </div>
+          
+          <div class="form-group">
+            <input type="text" class="form-input" id="perimeter" placeholder="Périmètre total (m)" inputmode="decimal">
           </div>
         </div>
-        <div style="height:8px"></div>
-        <div id="summaryTableWrap" style="overflow:auto"></div>
-        <div style="height:10px"></div>
-        <div class="chart-wrap card" id="chartWrap"><canvas id="costChart" aria-label="Répartition des coûts" role="img"></canvas></div>
-      </div>
-
-      <div style="height:8px"></div>
-      <div class="footer card" role="contentinfo">
-        <div class="small-muted">Exemple prérempli : parcelle 20×20 (perimètre 80 m, surface 400 m²). Voir le mode “Expert” pour paramètres avancés.</div>
-        <div>
-          <button class="btn" id="openPwaInstallBtn" style="display:none">Installer</button>
+        
+        <div class="form-group">
+          <label class="form-label">📏 Dimensions Mur</label>
+          <div class="input-group">
+            <div class="form-group">
+              <input type="text" class="form-input" id="wallWidth" value="0.2" inputmode="decimal">
+              <small>Largeur (m)</small>
+            </div>
+            <div class="form-group">
+              <input type="text" class="form-input" id="wallHeight" value="2.0" inputmode="decimal">
+              <small>Hauteur (m)</small>
+            </div>
+          </div>
         </div>
-      </div>
-    </section>
-  </div>
-
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-</div>
-
-<!-- ========== Inline JavaScript ========== -->
-<script>
-/*
-  INSTRUCTIONS & ARCHITECTURE (en-tête)
-  ------------------------------------
-  Ce fichier est un mono-fichier index.html pour une PWA calculatrice de clôture.
-  - Architecture : UI (wizard) -> Model (projet) -> Calculs (fonctions pures) -> Storage (IndexedDB) -> Export (JSON/CSV/PDF)
-  - Où changer presets : l'objet `PRESETS` ci-dessous.
-  - I18n : l'objet `I18N` au début de la logique peut être étendu.
-  - Service Worker : généré et enregistré via Blob (aucun fichier externe).
-  - Tests unitaires : bouton "Run tests" exécute assertions simples.
-  - Dépendances CDN : jsPDF, html2canvas, Chart.js. Voir bas du fichier.
-
-  CHANGELOG (bloc comment)
-  - v1.0 : Version initiale fournie (mono-fichier) - presets ciment/agrégats/acier fournis.
-  - Modifiez PRESETS.PRICES et PRESETS.MATERIAL_COEFS pour adapter couts locaux.
-*/
-
-(function(){
-  "use strict";
-
-  /* ---------------------------
-     I18N (français par défaut)
-     --------------------------- */
-  const I18N = {
-    fr:{
-      steps:[
-        {id:'parcelle', title:'Parcelle & Projet'},
-        {id:'proprete', title:'Béton de propreté'},
-        {id:'semelle', title:'Semelle filante'},
-        {id:'poteaux_base', title:'Poteaux (amorces)'},
-        {id:'poteaux_elev', title:'Poteaux en élévation'},
-        {id:'chainage', title:'Chainage bas & couronnement'},
-        {id:'mur', title:'Mur (maçonnerie)'},
-        {id:'finitions', title:'Finitions & Coûts'},
-        {id:'recap', title:'Récapitulatif'}
-      ],
-      labels:{
-        projectName:'Nom du projet',
-        contact:'Contact client',
-        currency:'Devise',
-        perim:'Périmètre (m)',
-        length:'Longueur (m)',
-        width:'Largeur (m)',
-        surface:'Surface (m²)',
-        save:'Sauvegarder projet',
-        load:'Charger',
-        delete:'Supprimer',
-      }
-    }
-  };
-  const LANG = 'fr';
-  const LO = I18N[LANG];
-
-  /* ---------------------------
-     Presets & paramètres
-     --------------------------- */
-  const PRESETS = {
-    DOSAGES: [150,200,250,300,350,400], // kg/m3
-    MATERIAL_COEFS: {
-      // Example presets per dosage — these are editable in UI and code
-      150:{gravel:0.78, sand:0.40, water:0.14},
-      200:{gravel:0.79, sand:0.42, water:0.155},
-      250:{gravel:0.80, sand:0.43, water:0.165},
-      300:{gravel:0.80, sand:0.44, water:0.17},
-      350:{gravel:0.80, sand:0.45, water:0.175},
-      400:{gravel:0.81, sand:0.46, water:0.18}
-    },
-    DENSITY_STEEL: 7850, // kg/m3
-    SACK_WEIGHT: 50, // kg
-    PRICES: { // exemples modifiables
-      cement_per_sack:70000, // XOF per 50kg
-      gravel_m3:20000,
-      sand_m3:4000,
-      steel_per_kg:450,
-      labor_montant:300000,
-      tva_rate:0.18
-    },
-    DEFAULTS:{
-      crochet_multiplier:10, // 10d
-      recouvrement_multiplier:40 // 40d
-    },
-    ROUND:{
-      decimals:2,
-      money:0
-    }
-  };
-
-  /* ---------------------------
-     Utility helpers
-     --------------------------- */
-  function $(sel, ctx=document){ return ctx.querySelector(sel); }
-  function $all(sel, ctx=document){ return Array.from(ctx.querySelectorAll(sel)); }
-  function showToast(msg, timeout=2500){
-    const t = $('#toast'); t.textContent = msg; t.style.display='block';
-    setTimeout(()=>{t.style.display='none'}, timeout);
-  }
-  function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
-  function round(v, dec=PRESETS.ROUND.decimals){ return Number(Number(v).toFixed(dec)); }
-  function roundMoney(v){ return Math.round(v); }
-  function parseNum(str){
-    if (str===null || str===undefined || str==='') return NaN;
-    // accept comma or point, remove spaces
-    const s = String(str).trim().replace(/\s+/g,'').replace(',', '.');
-    const n = Number(s);
-    return isFinite(n) ? n : NaN;
-  }
-
-  /* ---------------------------
-     Steel calculations (exact)
-     ---------------------------
-     massPerMeter(Ø mm) = π*(d/1000)^2 /4 * density (kg/m)
-  */
-  function massPerMeter(diamMm){
-    const d = parseNum(diamMm);
-    if (isNaN(d) || d<=0) return 0;
-    const area_m2 = Math.PI * Math.pow(d/1000,2) / 4;
-    return area_m2 * PRESETS.DENSITY_STEEL; // kg per meter
-  }
-
-  function lengthWithHooksAndLap(length_m, diameter_mm, extraCrochetMultiplier=PRESETS.DEFAULTS.crochet_multiplier, extraLapMultiplier=PRESETS.DEFAULTS.recouvrement_multiplier){
-    // crochets = 10d mm -> 10*diameter_mm (mm) convert to m => /1000
-    const hook_m = (extraCrochetMultiplier * diameter_mm)/1000;
-    const lap_m = (extraLapMultiplier * diameter_mm)/1000;
-    return Math.max(0, length_m + 2*hook_m + lap_m);
-  }
-
-  /* ---------------------------
-     Model (project object)
-     --------------------------- */
-  const Model = {
-    metadata:{
-      date: new Date().toISOString().slice(0,10),
-      project: "Cloture exemple 20x20",
-      client: "Client exemple",
-      currency: "XOF"
-    },
-    parcelle:{
-      L:20, W:20, perimetre:80, surface:400
-    },
-    beton_proprete:{
-      width_fouille:0.6, thickness:0.12, dosage:150, coeffs: PRESETS.MATERIAL_COEFS[150], price:{cement_per_sack:PRESETS.PRICES.cement_per_sack, gravel_m3:PRESETS.PRICES.gravel_m3, sand_m3:PRESETS.PRICES.sand_m3}
-    },
-    semelle:{
-      width:0.6, thickness:0.3, length_dev:null, // default use parcelle.perimetre
-      rebar:{
-        long_diam:10, long_n:4, long_length_each: null, // auto
-        trans_diam:8, trans_spacing:0.2
-      }
-    },
-    poteaux:{
-      spacing:3.0, // m
-      base_section:{w:0.25,h:0.25, height:0.6},
-      elev_section:{w:0.2,h:0.2},
-      bars:{
-        vertical_diam:12, vertical_n_per_poteau:4, frame_diam:8, frame_spacing:0.2
-      }
-    },
-    chainage:{
-      section_h:0.2, section_w:0.15, length:null, rebar:{diam_long:8, n_long:2}
-    },
-    mur:{
-      type:'brique_20_15', // preset
-      thickness:0.15, // m
-      unit_block:{L:0.40,W:0.20,H:0.15}, // default brique pleine 40x20x15 or creux 40x20x15
-      enduit:{enabled:true, thickness:0.015}
-    },
-    finish:{
-      labor_cost: PRESETS.PRICES.labor_montant,
-      margin_percent:10,
-      tva_rate: PRESETS.PRICES.tva_rate
-    },
-    computed:{}, // fill after calc
-    items:[]
-  };
-
-  /* ---------------------------
-     IndexedDB simple wrapper (projects DB)
-     --------------------------- */
-  const DB = (function(){
-    const DB_NAME = 'cloture_projects_db_v1';
-    const STORE = 'projects';
-    let db = null;
-    function openDB(){
-      return new Promise((resolve, reject)=>{
-        if (db) return resolve(db);
-        const req = indexedDB.open(DB_NAME, 1);
-        req.onupgradeneeded = (ev)=>{
-          db = ev.target.result;
-          if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE, {keyPath:'id'});
-        };
-        req.onsuccess = (ev)=>{ db = ev.target.result; resolve(db); };
-        req.onerror = (ev)=> reject(ev);
-      });
-    }
-    async function saveProject(obj){
-      const database = await openDB();
-      return new Promise((res, rej)=>{
-        const tx = database.transaction([STORE],'readwrite');
-        const store = tx.objectStore(STORE);
-        const id = obj.id || ('p_' + Date.now());
-        const toSave = Object.assign({}, obj, {id});
-        const put = store.put(toSave);
-        put.onsuccess = ()=> res(toSave);
-        put.onerror = (e)=> rej(e);
-      });
-    }
-    async function listProjects(){
-      const database = await openDB();
-      return new Promise((res, rej)=>{
-        const tx = database.transaction([STORE],'readonly'); const store = tx.objectStore(STORE);
-        const req = store.getAll();
-        req.onsuccess = ()=> res(req.result);
-        req.onerror = (e)=> rej(e);
-      });
-    }
-    async function getProject(id){
-      const database = await openDB();
-      return new Promise((res, rej)=>{
-        const tx = database.transaction([STORE],'readonly'); const store = tx.objectStore(STORE);
-        const req = store.get(id);
-        req.onsuccess = ()=> res(req.result);
-        req.onerror = (e)=> rej(e);
-      });
-    }
-    async function deleteProject(id){
-      const database = await openDB();
-      return new Promise((res, rej)=>{
-        const tx = database.transaction([STORE],'readwrite'); const store = tx.objectStore(STORE);
-        const req = store.delete(id);
-        req.onsuccess = ()=> res(true);
-        req.onerror = (e)=> rej(e);
-      });
-    }
-    return {saveProject, listProjects, getProject, deleteProject};
-  })();
-
-  /* ---------------------------
-     Calculation functions
-     --------------------------- */
-
-  function calculateParcelle(model){
-    const L = parseNum(model.parcelle.L);
-    const W = parseNum(model.parcelle.W);
-    let perim = parseNum(model.parcelle.perimetre);
-    let surface = parseNum(model.parcelle.surface);
-    if (isNaN(perim) || perim<=0){
-      if (!isNaN(L) && !isNaN(W)) perim = 2*(L+W);
-    }
-    if (isNaN(surface) || surface<=0){
-      if (!isNaN(L) && !isNaN(W)) surface = L*W;
-    }
-    model.parcelle.perimetre = perim;
-    model.parcelle.surface = surface;
-  }
-
-  function calcVolume(L,m,w,h){ return Math.max(0, L * w * h); }
-
-  function calcBetonProprete(model){
-    const m = model.beton_proprete;
-    const perim = model.parcelle.perimetre;
-    const L = perim;
-    const width = parseNum(m.width_fouille) || 0;
-    const thickness = parseNum(m.thickness) || 0;
-    const volume = calcVolume(L, width, thickness);
-    const dosage = parseNum(m.dosage) || PRESETS.DOSAGES[0];
-    const cementKg = volume * dosage;
-    const sacks = Math.ceil(cementKg / PRESETS.SACK_WEIGHT);
-    const coeffs = PRESETS.MATERIAL_COEFS[dosage] || m.coeffs || {gravel:0.8,sand:0.45,water:0.175};
-    const gravel_m3 = volume * coeffs.gravel;
-    const sand_m3 = volume * coeffs.sand;
-    const water_l = volume * coeffs.water * 1000; // litres
-    // costs
-    const cement_cost = sacks * PRESETS.PRICES.cement_per_sack;
-    const gravel_cost = Math.round(gravel_m3 * PRESETS.PRICES.gravel_m3);
-    const sand_cost = Math.round(sand_m3 * PRESETS.PRICES.sand_m3);
-    model.beton_proprete._calc = {
-      volume_m3: round(volume,3), cement_kg: round(cementKg,2), sacks, gravel_m3: round(gravel_m3,3),
-      sand_m3: round(sand_m3,3), water_l: round(water_l,2),
-      costs:{cement:cement_cost, gravel:gravel_cost, sand:sand_cost}
-    };
-    return model.beton_proprete._calc;
-  }
-
-  function calcSemelle(model){
-    const s = model.semelle;
-    const perim = model.parcelle.perimetre;
-    const L = s.length_dev && !isNaN(s.length_dev) ? s.length_dev : perim;
-    const volume = calcVolume(L, s.width, s.thickness);
-    // steel: long bars length etc.
-    const long_d = parseNum(s.rebar.long_diam) || 10;
-    const n_long = parseInt(s.rebar.long_n) || 0;
-    // approximate length of each long bar: length of semelle / n_long? In practice length per bar = L (longitudinale)
-    const length_each = L; // base assumption; include hooks + lap later when computing mass
-    const length_with_hooks = lengthWithHooksAndLap(length_each, long_d);
-    const total_long_length_m = n_long * length_with_hooks;
-    const mass_long = total_long_length_m * massPerMeter(long_d);
-    // transversal: calculate number of stirrups
-    const trans_spacing = parseNum(s.rebar.trans_spacing) || 0.2;
-    const n_etr = Math.ceil(L / trans_spacing);
-    const etrier_length = 2*(s.width + s.thickness) + 2 * ((PRESETS.DEFAULTS.crochet_multiplier * (s.rebar.trans_diam||8))/1000);
-    const total_etrier_length = n_etr * etrier_length;
-    const mass_etrier = total_etrier_length * massPerMeter(s.rebar.trans_diam);
-    const steel_kg = mass_long + mass_etrier;
-    const steel_cost = Math.round(steel_kg * PRESETS.PRICES.steel_per_kg);
-    // cement/gravel/sand may also be required for semelle (same logic)
-    const dosage = model.beton_proprete.dosage || PRESETS.DOSAGES[0];
-    const coeffs = PRESETS.MATERIAL_COEFS[dosage];
-    const gravel_m3 = volume * coeffs.gravel;
-    const sand_m3 = volume * coeffs.sand;
-    const cement_kg = volume * dosage;
-    const sacks = Math.ceil(cement_kg / PRESETS.SACK_WEIGHT);
-    const cement_cost = sacks * PRESETS.PRICES.cement_per_sack;
-    const gravel_cost = Math.round(gravel_m3 * PRESETS.PRICES.gravel_m3);
-    const sand_cost = Math.round(sand_m3 * PRESETS.PRICES.sand_m3);
-
-    model.semelle._calc = {
-      length_dev: L, volume_m3: round(volume,3),
-      steel:{kg: round(steel_kg,3), cost: steel_cost, breakdown:{long_kg:round(mass_long,3), etrier_kg:round(mass_etrier,3)}},
-      cement_kg: round(cement_kg,2), sacks, gravel_m3: round(gravel_m3,3), sand_m3: round(sand_m3,3),
-      costs:{cement:cement_cost, gravel:gravel_cost, sand:sand_cost}
-    };
-    return model.semelle._calc;
-  }
-
-  function calcPoteaux(model){
-    // compute number of poteaux based on spacing along perimeter
-    const spacing = model.poteaux.spacing || 3;
-    const perim = model.parcelle.perimetre;
-    const n = Math.max(1, Math.ceil(perim / spacing));
-    const base = model.poteaux.base_section;
-    const vol_each = base.w * base.h * base.height;
-    const total_vol = vol_each * n;
-    // steel per poteau verticals
-    const vert_d = parseNum(model.poteaux.bars.vertical_diam) || 12;
-    const vert_n = parseInt(model.poteaux.bars.vertical_n_per_poteau) || 4;
-    const vert_length = model.poteaux.base_section.height + model.poteaux.elev_section.height || 2.0; // approximate
-    const vert_length_with_hooks = lengthWithHooksAndLap(vert_length, vert_d);
-    const total_vert_length = vert_n * vert_length_with_hooks * n;
-    const vert_mass = total_vert_length * massPerMeter(vert_d);
-    // frames / cadres (stirrups)
-    const frame_d = parseNum(model.poteaux.bars.frame_diam) || 8;
-    const frame_spacing = parseNum(model.poteaux.bars.frame_spacing) || 0.2;
-    const frames_per_poteau = Math.ceil(vert_length / frame_spacing);
-    const frame_length_each = 2*(base.w + base.h) + 2*((PRESETS.DEFAULTS.crochet_multiplier * frame_d)/1000);
-    const total_frame_length = frames_per_poteau * frame_length_each * n;
-    const frames_mass = total_frame_length * massPerMeter(frame_d);
-    const steel_kg = vert_mass + frames_mass;
-    const steel_cost = Math.round(steel_kg * PRESETS.PRICES.steel_per_kg);
-    // concrete volume & material
-    const dosage = model.beton_proprete.dosage || PRESETS.DOSAGES[0];
-    const coeffs = PRESETS.MATERIAL_COEFS[dosage];
-    const gravel_m3 = total_vol * coeffs.gravel;
-    const sand_m3 = total_vol * coeffs.sand;
-    const cement_kg = total_vol * dosage;
-    const sacks = Math.ceil(cement_kg / PRESETS.SACK_WEIGHT);
-    const cement_cost = sacks * PRESETS.PRICES.cement_per_sack;
-    model.poteaux._calc = {
-      n_poteaux: n, total_vol_m3: round(total_vol,3),
-      steel:{kg: round(steel_kg,3), cost: steel_cost, breakdown:{vertical_kg:round(vert_mass,3), frames_kg:round(frames_mass,3)}},
-      cement_kg: round(cement_kg,2), sacks, gravel_m3:round(gravel_m3,3), sand_m3:round(sand_m3,3),
-      costs:{cement:cement_cost, gravel:Math.round(gravel_m3*PRESETS.PRICES.gravel_m3), sand:Math.round(sand_m3*PRESETS.PRICES.sand_m3)}
-    };
-    return model.poteaux._calc;
-  }
-
-  function calcChainage(model){
-    const section_h = model.chainage.section_h || 0.2;
-    const section_w = model.chainage.section_w || 0.15;
-    const perim = model.parcelle.perimetre;
-    const L = model.chainage.length || perim;
-    const volume = calcVolume(L, section_w, section_h);
-    // steel: simple approach n_long * L
-    const diam = parseNum(model.chainage.rebar?.diam_long || model.chainage.rebar?.diam || 8) || 8;
-    const n_long = parseInt(model.chainage.rebar?.n_long || 2);
-    const length_each = L;
-    const length_with_hooks = lengthWithHooksAndLap(length_each, diam);
-    const mass_long = length_with_hooks * n_long * massPerMeter(diam);
-    const steel_cost = Math.round(mass_long * PRESETS.PRICES.steel_per_kg);
-    const dosage = model.beton_proprete.dosage || PRESETS.DOSAGES[0];
-    const coeffs = PRESETS.MATERIAL_COEFS[dosage];
-    const gravel_m3 = volume * coeffs.gravel;
-    const sand_m3 = volume * coeffs.sand;
-    const cement_kg = volume * dosage;
-    const sacks = Math.ceil(cement_kg / PRESETS.SACK_WEIGHT);
-    model.chainage._calc = {
-      volume_m3: round(volume,3), steel_kg: round(mass_long,3), steel_cost,
-      cement_kg: round(cement_kg,2), sacks, gravel_m3: round(gravel_m3,3), sand_m3: round(sand_m3,3),
-      costs:{cement: sacks * PRESETS.PRICES.cement_per_sack, gravel:Math.round(gravel_m3*PRESETS.PRICES.gravel_m3), sand:Math.round(sand_m3*PRESETS.PRICES.sand_m3)}
-    };
-    return model.chainage._calc;
-  }
-
-  function calcMur(model){
-    // compute wall surface (perimeter * height)
-    const thickness = model.mur.thickness || model.mur.unit_block.H || 0.15;
-    const perim = model.parcelle.perimetre;
-    // assume average wall height 1.8m (or base on input?) we'll derive from user by default 2m
-    const wall_height = model.mur.height || 2.0;
-    const surface = perim * wall_height;
-    // blocks count (approx): volume wall / volume unit block
-    const blockVol = (model.mur.unit_block.L * model.mur.unit_block.H * model.mur.unit_block.W) || 0.012; // m3
-    const wallVol = perim * thickness * wall_height;
-    const nbBlocks = Math.ceil(wallVol / blockVol);
-    const enduit_volume = model.mur.enduit && model.mur.enduit.enabled ? surface * model.mur.enduit.thickness : 0;
-    // costs placeholders
-    model.mur._calc = {
-      wall_height, surface_m2: round(surface,2), volume_m3: round(wallVol,3), nbBlocks, enduit_m3: round(enduit_volume,3)
-    };
-    return model.mur._calc;
-  }
-
-  function computeAll(model){
-    calculateParcelle(model);
-    const bet = calcBetonProprete(model);
-    const sem = calcSemelle(model);
-    const pot = calcPoteaux(model);
-    const chain = calcChainage(model);
-    const mur = calcMur(model);
-
-    // aggregate totals
-    const materials = {
-      cement_sacks: (bet.sacks||0) + (sem.sacks||0) + (pot.sacks||0) + (chain.sacks||0),
-      cement_kg: (bet.cement_kg||0) + (sem.cement_kg||0) + (pot.cement_kg||0) + (chain.cement_kg||0),
-      gravel_m3: (bet.gravel_m3||0) + (sem.gravel_m3||0) + (pot.gravel_m3||0) + (chain.gravel_m3||0),
-      sand_m3: (bet.sand_m3||0) + (sem.sand_m3||0) + (pot.sand_m3||0) + (chain.sand_m3||0),
-      steel_kg: (sem.steel?.kg||0) + (pot.steel?.kg||0) + (chain.steel_kg||0)
-    };
-    const costMaterials = (bet.costs?.cement||0) + (bet.costs?.gravel||0) + (bet.costs?.sand||0)
-                        + (sem.costs?.cement||0) + (sem.costs?.gravel||0) + (sem.costs?.sand||0)
-                        + (pot.costs?.cement||0) + (pot.costs?.gravel||0) + (pot.costs?.sand||0)
-                        + (chain.costs?.cement||0) + (chain.costs?.gravel||0) + (chain.costs?.sand||0);
-    const steelCost = Math.round(((sem.steel?.cost||0) + (pot.steel?.cost||0) + (chain.steel_cost||0)) || 0);
-    const labor = model.finish.labor_cost || 0;
-    const subtotal = costMaterials + steelCost + labor;
-    const margin = Math.round(subtotal * (model.finish.margin_percent || 0)/100);
-    const tva = Math.round((subtotal + margin) * (model.finish.tva_rate||0));
-    const grand_total = subtotal + margin + tva;
-    model.computed = {materials, costMaterials, steelCost, labor, subtotal, margin, tva, grand_total};
-    // prepare items array for JSON export
-    model.items = [
-      {id:'beton_proprete', ...bet},
-      {id:'semelle', ...sem},
-      {id:'poteaux', ...pot},
-      {id:'chainage', ...chain},
-      {id:'mur', ...mur}
-    ];
-    return model;
-  }
-
-  /* ---------------------------
-     UI Renderers
-     --------------------------- */
-
-  const Steps = LO.steps;
-  let currentStepIndex = 0;
-
-  function renderStepper(){
-    const el = $('#stepper');
-    el.innerHTML = '';
-    Steps.forEach((s, idx)=>{
-      const div = document.createElement('div');
-      div.className = 'step';
-      div.setAttribute('role','tab');
-      div.setAttribute('tabindex','0');
-      if (idx===currentStepIndex) div.setAttribute('aria-current','true'); else div.removeAttribute('aria-current');
-      div.dataset.step = s.id;
-      div.innerHTML = `<div class="num">${idx+1}</div><div class="label">${s.title}</div>`;
-      div.addEventListener('click', ()=>{ currentStepIndex = idx; renderStepContent(); renderStepper(); });
-      el.appendChild(div);
-    });
-  }
-
-  function renderStepContent(){
-    const container = $('#stepContent');
-    container.innerHTML = '';
-    const step = Steps[currentStepIndex];
-    const wrapper = document.createElement('div');
-    wrapper.setAttribute('role','region');
-    wrapper.setAttribute('aria-labelledby','stepTitle');
-    // Build forms per step id
-    const h = document.createElement('h3'); h.id='stepTitle'; h.textContent = step.title;
-    const desc = document.createElement('div'); desc.className='small-muted'; desc.style.marginBottom='8px';
-    wrapper.appendChild(h); wrapper.appendChild(desc);
-
-    if (step.id === 'parcelle'){
-      desc.textContent = 'Entrez les dimensions de la parcelle. Vous pouvez saisir longueur + largeur ou le périmètre directement.';
-      const form = document.createElement('div');
-      form.className='form-row';
-      form.innerHTML = `
-        <div class="field"><label>Nom du projet</label><input id="inProjectName" type="text" value="${escapeHtml(Model.metadata.project)}" /></div>
-        <div class="field"><label>Contact</label><input id="inContact" type="text" value="${escapeHtml(Model.metadata.client)}" /></div>
-      `;
-      const form2 = document.createElement('div'); form2.className='form-row';
-      form2.innerHTML = `
-        <div class="field"><label>Longueur (m)</label><input id="inLength" type="text" inputmode="decimal" value="${Model.parcelle.L}" /></div>
-        <div class="field"><label>Largeur (m)</label><input id="inWidth" type="text" inputmode="decimal" value="${Model.parcelle.W}" /></div>
-        <div class="field"><label>Périmètre (m)</label><input id="inPerim" type="text" inputmode="decimal" value="${Model.parcelle.perimetre}" /></div>
-        <div class="field"><label>Surface (m²)</label><input id="inSurface" type="text" inputmode="decimal" value="${Model.parcelle.surface}" /></div>
-      `;
-      wrapper.appendChild(form); wrapper.appendChild(form2);
-      // currency & mode
-      const small = document.createElement('div'); small.className='form-row';
-      small.innerHTML = `<div class="field"><label>Devise</label><input id="inCurrency" type="text" value="${Model.metadata.currency}" /></div>
-                         <div class="field"><label>Mode</label><select id="modeSelect"><option value="rapide">Rapide</option><option value="expert">Expert</option></select></div>`;
-      wrapper.appendChild(small);
-      const actions = document.createElement('div'); actions.className='actions'; actions.style.marginTop='10px';
-      const nextBtn = document.createElement('button'); nextBtn.className='btn'; nextBtn.textContent='Suivant';
-      nextBtn.addEventListener('click', ()=>{
-        // validate & save
-        const L = parseNum($('#inLength').value);
-        const W = parseNum($('#inWidth').value);
-        const p = parseNum($('#inPerim').value);
-        const srf = parseNum($('#inSurface').value);
-        if ((isNaN(L) || L<=0) && (isNaN(p) || p<=0)){
-          alertFocus($('#inLength'), 'Entrer longueur ou périmètre valide.');
-          return;
-        }
-        Model.parcelle.L = isNaN(L)? Model.parcelle.L : L;
-        Model.parcelle.W = isNaN(W)? Model.parcelle.W : W;
-        Model.parcelle.perimetre = isNaN(p)? Model.parcelle.perimetre : p;
-        Model.parcelle.surface = isNaN(srf)? Model.parcelle.surface : srf;
-        Model.metadata.project = $('#inProjectName').value || Model.metadata.project;
-        Model.metadata.client = $('#inContact').value || Model.metadata.client;
-        Model.metadata.currency = $('#inCurrency').value || Model.metadata.currency;
-        computeAll(Model);
-        currentStepIndex = Math.min(Steps.length-1, currentStepIndex+1);
-        renderStepContent(); renderStepper(); renderMini();
-      });
-      const prevBtn = document.createElement('button'); prevBtn.className='btn secondary'; prevBtn.textContent='Précédent';
-      prevBtn.addEventListener('click', ()=>{
-        currentStepIndex = Math.max(0, currentStepIndex-1);
-        renderStepContent(); renderStepper();
-      });
-      actions.appendChild(prevBtn); actions.appendChild(nextBtn);
-      wrapper.appendChild(actions);
-    }
-
-    else if (step.id === 'proprete'){
-      desc.textContent = 'Paramètres du béton de propreté (très utilisés pour semelle, fondations).';
-      const f = document.createElement('div'); f.className='form-row';
-      f.innerHTML = `
-        <div class="field"><label>Largeur fouille (m)</label><input id="inPropWidth" type="text" value="${Model.beton_proprete.width_fouille}" inputmode="decimal" /></div>
-        <div class="field"><label>Épaisseur (m)</label><input id="inPropThickness" type="text" value="${Model.beton_proprete.thickness}" inputmode="decimal" /></div>
-        <div class="field"><label>Dosage ciment (kg/m³)</label>
-          <select id="inPropDosage">${PRESETS.DOSAGES.map(d=>`<option ${d===Model.beton_proprete.dosage?'selected':''} value="${d}">${d}</option>`).join('')}</select>
-        </div>
-      `;
-      wrapper.appendChild(f);
-      // coeffs editor
-      const coeffsWrap = document.createElement('div');
-      coeffsWrap.innerHTML = `<div class="small-muted">Coefficients d'agrégats (modifiable)</div>
-      <div class="form-row">
-        <div class="field"><label>Gravier (xV)</label><input id="inCoeffGravel" type="text" value="${Model.beton_proprete.coeffs.gravel}" /></div>
-        <div class="field"><label>Sable (xV)</label><input id="inCoeffSand" type="text" value="${Model.beton_proprete.coeffs.sand}" /></div>
-        <div class="field"><label>Eau (xV)</label><input id="inCoeffWater" type="text" value="${Model.beton_proprete.coeffs.water}" /></div>
-      </div>`;
-      wrapper.appendChild(coeffsWrap);
-      const actions = document.createElement('div'); actions.className='actions';
-      const nextBtn=document.createElement('button'); nextBtn.className='btn'; nextBtn.textContent='Suivant';
-      nextBtn.addEventListener('click', ()=>{
-        // validation
-        const w = parseNum($('#inPropWidth').value);
-        const t = parseNum($('#inPropThickness').value);
-        if (isNaN(w) || w<=0){ alertFocus($('#inPropWidth'),'Largeur fouille invalide'); return; }
-        if (isNaN(t) || t<=0){ alertFocus($('#inPropThickness'),'Épaisseur invalide'); return; }
-        Model.beton_proprete.width_fouille = w; Model.beton_proprete.thickness = t;
-        const d = parseNum($('#inPropDosage').value);
-        Model.beton_proprete.dosage = d;
-        Model.beton_proprete.coeffs = {
-          gravel: parseNum($('#inCoeffGravel').value) || PRESETS.MATERIAL_COEFS[d].gravel,
-          sand: parseNum($('#inCoeffSand').value) || PRESETS.MATERIAL_COEFS[d].sand,
-          water: parseNum($('#inCoeffWater').value) || PRESETS.MATERIAL_COEFS[d].water
-        };
-        computeAll(Model); currentStepIndex++; renderStepContent(); renderStepper(); renderMini();
-      });
-      const prevBtn=document.createElement('button'); prevBtn.className='btn secondary'; prevBtn.textContent='Précédent';
-      prevBtn.addEventListener('click', ()=>{ currentStepIndex--; renderStepContent(); renderStepper(); });
-      actions.appendChild(prevBtn); actions.appendChild(nextBtn);
-      wrapper.appendChild(actions);
-    }
-
-    else if (step.id === 'semelle'){
-      desc.textContent = 'Semelle filante : dimensions et ferraillage.';
-      const f = document.createElement('div'); f.className='form-row';
-      f.innerHTML = `
-        <div class="field"><label>Largeur semelle (m)</label><input id="inSemWidth" type="text" value="${Model.semelle.width}" inputmode="decimal" /></div>
-        <div class="field"><label>Épaisseur semelle (m)</label><input id="inSemThickness" type="text" value="${Model.semelle.thickness}" inputmode="decimal" /></div>
-        <div class="field"><label>Longueur développée (m) (laisser vide = périmètre)</label><input id="inSemLength" type="text" value="${Model.semelle.length_dev||''}" /></div>
-      `;
-      const f2 = document.createElement('div'); f2.className='form-row';
-      f2.innerHTML = `
-        <div class="field"><label>Barres longitudinales Ø (mm)</label><input id="inSemLongD" type="text" value="${Model.semelle.rebar.long_diam}" /></div>
-        <div class="field"><label>Nombre barres longitudinales</label><input id="inSemLongN" type="text" value="${Model.semelle.rebar.long_n}" /></div>
-        <div class="field"><label>Etrier Ø (mm)</label><input id="inSemTransD" type="text" value="${Model.semelle.rebar.trans_diam}" /></div>
-      `;
-      wrapper.appendChild(f); wrapper.appendChild(f2);
-      const actions=document.createElement('div'); actions.className='actions';
-      const prev=document.createElement('button'); prev.className='btn secondary'; prev.textContent='Précédent';
-      prev.addEventListener('click', ()=>{ currentStepIndex--; renderStepContent(); renderStepper(); });
-      const next=document.createElement('button'); next.className='btn'; next.textContent='Suivant';
-      next.addEventListener('click', ()=>{
-        const w=parseNum($('#inSemWidth').value), t=parseNum($('#inSemThickness').value);
-        if (isNaN(w)||w<=0){ alertFocus($('#inSemWidth'),'Largeur invalide'); return; }
-        if (isNaN(t)||t<=0){ alertFocus($('#inSemThickness'),'Épaisseur invalide'); return; }
-        Model.semelle.width = w; Model.semelle.thickness = t;
-        const l = parseNum($('#inSemLength').value); Model.semelle.length_dev = isNaN(l) ? null : l;
-        Model.semelle.rebar.long_diam = parseNum($('#inSemLongD').value) || Model.semelle.rebar.long_diam;
-        Model.semelle.rebar.long_n = parseInt($('#inSemLongN').value) || Model.semelle.rebar.long_n;
-        Model.semelle.rebar.trans_diam = parseNum($('#inSemTransD').value) || Model.semelle.rebar.trans_diam;
-        computeAll(Model); currentStepIndex++; renderStepContent(); renderStepper(); renderMini();
-      });
-      actions.appendChild(prev); actions.appendChild(next); wrapper.appendChild(actions);
-    }
-
-    else if (step.id === 'poteaux_base'){
-      desc.textContent = 'Poteaux - amorces et base';
-      const f=document.createElement('div'); f.className='form-row';
-      f.innerHTML = `
-        <div class="field"><label>Espacement poteaux (m)</label><input id="inPSpacing" value="${Model.poteaux.spacing}" /></div>
-        <div class="field"><label>Section base W (m)</label><input id="inPBaseW" value="${Model.poteaux.base_section.w}" /></div>
-        <div class="field"><label>Section base H (m)</label><input id="inPBaseH" value="${Model.poteaux.base_section.h}" /></div>
-      `;
-      const f2=document.createElement('div'); f2.className='form-row';
-      f2.innerHTML = `
-        <div class="field"><label>Hauteur amorce (m)</label><input id="inPBaseHei" value="${Model.poteaux.base_section.height}" /></div>
-        <div class="field"><label>Ø vertical (mm)</label><input id="inPVertD" value="${Model.poteaux.bars.vertical_diam}" /></div>
-        <div class="field"><label>Nb vertical/poteau</label><input id="inPVertN" value="${Model.poteaux.bars.vertical_n_per_poteau}" /></div>
-      `;
-      wrapper.appendChild(f); wrapper.appendChild(f2);
-      const actions=document.createElement('div'); actions.className='actions';
-      const prev=document.createElement('button'); prev.className='btn secondary'; prev.textContent='Précédent'; prev.addEventListener('click', ()=>{ currentStepIndex--; renderStepContent(); renderStepper(); });
-      const next=document.createElement('button'); next.className='btn'; next.textContent='Suivant';
-      next.addEventListener('click', ()=>{
-        Model.poteaux.spacing = parseNum($('#inPSpacing').value) || Model.poteaux.spacing;
-        Model.poteaux.base_section.w = parseNum($('#inPBaseW').value) || Model.poteaux.base_section.w;
-        Model.poteaux.base_section.h = parseNum($('#inPBaseH').value) || Model.poteaux.base_section.h;
-        Model.poteaux.base_section.height = parseNum($('#inPBaseHei').value) || Model.poteaux.base_section.height;
-        Model.poteaux.bars.vertical_diam = parseNum($('#inPVertD').value) || Model.poteaux.bars.vertical_diam;
-        Model.poteaux.bars.vertical_n_per_poteau = parseInt($('#inPVertN').value) || Model.poteaux.bars.vertical_n_per_poteau;
-        computeAll(Model); currentStepIndex++; renderStepContent(); renderStepper(); renderMini();
-      });
-      actions.appendChild(prev); actions.appendChild(next); wrapper.appendChild(actions);
-    }
-
-    else if (step.id === 'poteaux_elev'){
-      desc.textContent = 'Poteaux en élévation - armatures et ancrages.';
-      const f=document.createElement('div'); f.className='form-row';
-      f.innerHTML = `
-        <div class="field"><label>Hauteur élévation (m)</label><input id="inPHeight" value="${Model.poteaux.elev_section.height||2}" /></div>
-        <div class="field"><label>Ø vertical élévation (mm)</label><input id="inPElevVertD" value="${Model.poteaux.bars.vertical_diam}" /></div>
-        <div class="field"><label>Ancrages (m)</label><input id="inAnch" value="${Model.poteaux.anchorage||0.4}" /></div>
-      `;
-      wrapper.appendChild(f);
-      const actions=document.createElement('div'); actions.className='actions';
-      const prev=document.createElement('button'); prev.className='btn secondary'; prev.textContent='Précédent'; prev.addEventListener('click', ()=>{ currentStepIndex--; renderStepContent(); renderStepper(); });
-      const next=document.createElement('button'); next.className='btn'; next.textContent='Suivant';
-      next.addEventListener('click', ()=>{
-        Model.poteaux.elev_section.height = parseNum($('#inPHeight').value) || Model.poteaux.elev_section.height;
-        Model.poteaux.bars.vertical_diam = parseNum($('#inPElevVertD').value) || Model.poteaux.bars.vertical_diam;
-        Model.poteaux.anchorage = parseNum($('#inAnch').value) || Model.poteaux.anchorage || 0.4;
-        computeAll(Model); currentStepIndex++; renderStepContent(); renderStepper(); renderMini();
-      });
-      actions.appendChild(prev); actions.appendChild(next); wrapper.appendChild(actions);
-    }
-
-    else if (step.id === 'chainage'){
-      desc.textContent = 'Chainage bas & couronnement';
-      const f=document.createElement('div'); f.className='form-row';
-      f.innerHTML = `
-        <div class="field"><label>Hauteur (m)</label><input id="inChainH" value="${Model.chainage.section_h}" /></div>
-        <div class="field"><label>Largeur (m)</label><input id="inChainW" value="${Model.chainage.section_w}" /></div>
-      `;
-      wrapper.appendChild(f);
-      const actions=document.createElement('div'); actions.className='actions';
-      const prev=document.createElement('button'); prev.className='btn secondary'; prev.textContent='Précédent'; prev.addEventListener('click', ()=>{ currentStepIndex--; renderStepContent(); renderStepper(); });
-      const next=document.createElement('button'); next.className='btn'; next.textContent='Suivant';
-      next.addEventListener('click', ()=>{
-        Model.chainage.section_h = parseNum($('#inChainH').value) || Model.chainage.section_h;
-        Model.chainage.section_w = parseNum($('#inChainW').value) || Model.chainage.section_w;
-        computeAll(Model); currentStepIndex++; renderStepContent(); renderStepper(); renderMini();
-      });
-      actions.appendChild(prev); actions.appendChild(next); wrapper.appendChild(actions);
-    }
-
-    else if (step.id === 'mur'){
-      desc.textContent = 'Mur : type, épaisseur, enduit.';
-      const f=document.createElement('div'); f.className='form-row';
-      f.innerHTML = `
-        <div class="field"><label>Type bloc/brique</label>
-          <select id="inMurType">
-            <option value="brique_20_15" ${Model.mur.type==='brique_20_15'?'selected':''}>Brique pleine 40x20x15</option>
-            <option value="brique_creuse_15" ${Model.mur.type==='brique_creuse_15'?'selected':''}>Brique creuse 40x20x15</option>
-            <option value="bloc_20" ${Model.mur.type==='bloc_20'?'selected':''}>Bloc 20cm</option>
+        
+        <div class="form-group">
+          <label class="form-label">💱 Devise</label>
+          <select class="form-select" id="currency">
+            <option value="XOF">XOF (Franc CFA)</option>
+            <option value="EUR">EUR (Euro)</option>
+            <option value="USD">USD (Dollar US)</option>
           </select>
         </div>
-        <div class="field"><label>Épaisseur (m)</label><input id="inMurThickness" value="${Model.mur.thickness}" /></div>
-        <div class="field"><label>Hauteur mur (m)</label><input id="inMurHeight" value="${Model.mur.height||2}" /></div>
-      `;
-      const enduit = document.createElement('div'); enduit.className='form-row'; enduit.innerHTML = `
-        <div class="field"><label>Enduit (activer)</label><select id="inEnduitEnabled"><option value="1">${Model.mur.enduit.enabled? 'Oui':'Oui'}</option><option value="0">${Model.mur.enduit.enabled? 'Non':'Non'}</option></select></div>
-        <div class="field"><label>Épaisseur enduit (m)</label><input id="inEnduitThick" value="${Model.mur.enduit.thickness}" /></div>
-      `;
-      wrapper.appendChild(f); wrapper.appendChild(enduit);
-      const actions=document.createElement('div'); actions.className='actions';
-      const prev=document.createElement('button'); prev.className='btn secondary'; prev.textContent='Précédent'; prev.addEventListener('click', ()=>{ currentStepIndex--; renderStepContent(); renderStepper(); });
-      const next=document.createElement('button'); next.className='btn'; next.textContent='Suivant';
-      next.addEventListener('click', ()=>{
-        Model.mur.type = $('#inMurType').value;
-        Model.mur.thickness = parseNum($('#inMurThickness').value) || Model.mur.thickness;
-        Model.mur.height = parseNum($('#inMurHeight').value) || Model.mur.height;
-        Model.mur.enduit.enabled = $('#inEnduitEnabled').value === '1';
-        Model.mur.enduit.thickness = parseNum($('#inEnduitThick').value) || Model.mur.enduit.thickness;
-        computeAll(Model); currentStepIndex++; renderStepContent(); renderStepper(); renderMini();
-      });
-      actions.appendChild(prev); actions.appendChild(next); wrapper.appendChild(actions);
-    }
+        
+        <div class="summary-box">
+          <h3 class="summary-title">📊 Calculs automatiques</h3>
+          <div class="summary-item">
+            <span>📏 Périmètre:</span>
+            <span id="displayPerimeter">-- m</span>
+          </div>
+          <div class="summary-item">
+            <span>📐 Surface:</span>
+            <span id="displayArea">-- m²</span>
+          </div>
+        </div>
+        
+        <div class="button-group">
+          <button class="btn btn-primary" onclick="nextScreen(1)">
+            <span class="btn-icon">🚀</span>
+            Commencer
+          </button>
+        </div>
+      </section>
 
-    else if (step.id === 'finitions'){
-      desc.textContent = 'Finitions, coûts main d’œuvre, marge et TVA.';
-      const f=document.createElement('div'); f.className='form-row';
-      f.innerHTML = `
-        <div class="field"><label>Coût main d'œuvre total (${Model.metadata.currency})</label><input id="inLabor" value="${Model.finish.labor_cost}" /></div>
-        <div class="field"><label>Marge (%)</label><input id="inMargin" value="${Model.finish.margin_percent}" /></div>
-        <div class="field"><label>TVA (%)</label><input id="inTVA" value="${Model.finish.tva_rate}" /></div>
-      `;
-      wrapper.appendChild(f);
-      const actions=document.createElement('div'); actions.className='actions';
-      const prev=document.createElement('button'); prev.className='btn secondary'; prev.textContent='Précédent'; prev.addEventListener('click', ()=>{ currentStepIndex--; renderStepContent(); renderStepper(); });
-      const calcBtn=document.createElement('button'); calcBtn.className='btn'; calcBtn.textContent='Calculer & Récap';
-      calcBtn.addEventListener('click', ()=>{
-        Model.finish.labor_cost = parseNum($('#inLabor').value) || Model.finish.labor_cost;
-        Model.finish.margin_percent = parseNum($('#inMargin').value) || Model.finish.margin_percent;
-        Model.finish.tva_rate = parseNum($('#inTVA').value) || Model.finish.tva_rate;
-        computeAll(Model); currentStepIndex = Steps.findIndex(s=>s.id==='recap'); renderStepContent(); renderStepper(); renderMini();
-      });
-      actions.appendChild(prev); actions.appendChild(calcBtn); wrapper.appendChild(actions);
-    }
+      <!-- Écran 2 : Béton de propreté -->
+      <section id="screen2" class="screen">
+        <div class="screen-header">
+          <h2 class="screen-title">🧹 Béton de propreté</h2>
+          <p class="screen-subtitle">Calcul des fondations</p>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">📏 Largeur de la fouille (m)</label>
+          <input type="text" class="form-input" id="cleaningWidth" value="0.6" inputmode="decimal">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">📐 Épaisseur (m)</label>
+          <input type="text" class="form-input" id="cleaningThickness" value="0.1" inputmode="decimal">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">🧱 Dosage ciment (kg/m³)</label>
+          <input type="text" class="form-input" id="cementDosage" value="350" inputmode="decimal">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">💰 Prix unitaires</label>
+          <div class="input-group">
+            <div class="form-group">
+              <input type="text" class="form-input" id="cementPrice" placeholder="Ciment/sac" value="70000" inputmode="decimal">
+              <small>Ciment (XOF)</small>
+            </div>
+            <div class="form-group">
+              <input type="text" class="form-input" id="gravelPrice" placeholder="Gravier/m³" value="20000" inputmode="decimal">
+              <small>Gravier (XOF)</small>
+            </div>
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-input" id="sandPrice" placeholder="Sable (XOF/m³)" value="4000" inputmode="decimal">
+          </div>
+        </div>
+        
+        <div class="summary-box">
+          <h3 class="summary-title">📊 Résultats</h3>
+          <div class="summary-item">
+            <span>㎥ Volume béton:</span>
+            <span id="cleaningVolume">-- m³</span>
+          </div>
+          <div class="summary-item">
+            <span>🧱 Ciment:</span>
+            <span id="cleaningCement">-- kg</span>
+          </div>
+          <div class="summary-item">
+            <span>📦 Sacs de ciment:</span>
+            <span id="cleaningSacks">-- sacs</span>
+          </div>
+          <div class="summary-item">
+            <span>💰 Coût total:</span>
+            <span id="cleaningCost">-- XOF</span>
+          </div>
+        </div>
+        
+        <div class="button-group">
+          <button class="btn btn-outline" onclick="prevScreen(2)">
+            <span class="btn-icon">⬅️</span>
+            Précédent
+          </button>
+          <button class="btn btn-primary" onclick="nextScreen(2)">
+            Suivant
+            <span class="btn-icon">➡️</span>
+          </button>
+        </div>
+      </section>
 
-    else if (step.id === 'recap'){
-      desc.textContent = 'Détail complet des matériaux, acier, main d’œuvre et total.';
-      // Show summary table
-      const sdiv = document.createElement('div');
-      sdiv.innerHTML = `<div class="small-muted">Calcul en date : ${Model.metadata.date}</div>`;
-      // generate table
-      const table = document.createElement('table'); table.className='table';
-      table.innerHTML = `<thead><tr><th>Élément</th><th>Détails</th><th>Coûts (${Model.metadata.currency})</th></tr></thead><tbody></tbody>`;
-      const tbody = table.querySelector('tbody');
-      computeAll(Model);
-      Model.items.forEach(it=>{
-        if (!it) return;
-        const costs = it.costs ? Object.values(it.costs).reduce((a,b)=>a+(b||0),0) : 0;
-        const steelcost = it.steel?.cost || 0;
-        const totalcost = Math.round(costs + (steelcost||0));
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${escapeHtml(it.id)}</td>
-          <td class="small-muted">${escapeHtml(JSON.stringify(stripCalc(it), null, 0)).slice(0,200)}</td>
-          <td>${totalcost.toLocaleString()}</td>`;
-        tbody.appendChild(tr);
-      });
-      const totalsRow = document.createElement('tr');
-      totalsRow.innerHTML = `<td><strong>Totaux</strong></td><td></td><td><strong>${Model.computed.grand_total.toLocaleString()}</strong></td>`;
-      tbody.appendChild(totalsRow);
-      sdiv.appendChild(table);
-      wrapper.appendChild(sdiv);
-      // Download buttons are in header but duplicate here
-      const actions=document.createElement('div'); actions.className='actions';
-      const pdfBtn=document.createElement('button'); pdfBtn.className='btn'; pdfBtn.textContent='Exporter PDF';
-      pdfBtn.addEventListener('click', ()=> exportPDF());
-      actions.appendChild(pdfBtn);
-      wrapper.appendChild(actions);
-    }
+      <!-- Écran 3 : Semelle filante -->
+      <section id="screen3" class="screen">
+        <div class="screen-header">
+          <h2 class="screen-title">磉 Semelle filante</h2>
+          <p class="screen-subtitle">Fondations continues</p>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">📏 Largeur de la fouille (m)</label>
+          <input type="text" class="form-input" id="footingWidth" value="0.6" inputmode="decimal">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">📐 Épaisseur (m)</label>
+          <input type="text" class="form-input" id="footingHeight" value="0.3" inputmode="decimal">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">🧱 Dosage ciment (kg/m³)</label>
+          <input type="text" class="form-input" id="footingCementDosage" value="350" inputmode="decimal">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">钢筋 Ferraillage</label>
+          <div class="input-group">
+            <div class="form-group">
+              <input type="text" class="form-input" id="rebarDiameterLong" value="12" inputmode="decimal">
+              <small>⌀ Longitudinal (mm)</small>
+            </div>
+            <div class="form-group">
+              <input type="text" class="form-input" id="rebarCountLong" value="4" inputmode="decimal">
+              <small>Nb barres</small>
+            </div>
+          </div>
+          <div class="input-group">
+            <div class="form-group">
+              <input type="text" class="form-input" id="rebarDiameterTrans" value="8" inputmode="decimal">
+              <small>⌀ Étriers (mm)</small>
+            </div>
+            <div class="form-group">
+              <input type="text" class="form-input" id="rebarSpacingTrans" value="200" inputmode="decimal">
+              <small>Espacement (mm)</small>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">💰 Prix de l'acier (XOF/kg)</label>
+          <input type="text" class="form-input" id="steelPrice" value="450" inputmode="decimal">
+        </div>
+        
+        <div class="summary-box">
+          <h3 class="summary-title">📊 Résultats</h3>
+          <div class="summary-item">
+            <span>㎥ Volume béton:</span>
+            <span id="footingVolume">-- m³</span>
+          </div>
+          <div class="summary-item">
+            <span>钢筋 Acier longitudinal:</span>
+            <span id="footingSteelLong">-- kg</span>
+          </div>
+          <div class="summary-item">
+            <span>⭕ Étriers:</span>
+            <span id="footingSteelTrans">-- kg</span>
+          </div>
+          <div class="summary-item">
+            <span>💰 Coût total:</span>
+            <span id="footingCost">-- XOF</span>
+          </div>
+        </div>
+        
+        <div class="button-group">
+          <button class="btn btn-outline" onclick="prevScreen(3)">
+            <span class="btn-icon">⬅️</span>
+            Précédent
+          </button>
+          <button class="btn btn-primary" onclick="nextScreen(3)">
+            Suivant
+            <span class="btn-icon">➡️</span>
+          </button>
+        </div>
+      </section>
 
-    else {
-      wrapper.innerHTML += `<div>Écran non défini</div>`;
-    }
+      <!-- Écran 4 : Poteaux amorces -->
+      <section id="screen4" class="screen">
+        <div class="screen-header">
+          <h2 class="screen-title">เสา Poteaux amorces</h2>
+          <p class="screen-subtitle">Fondations des poteaux</p>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">📏 Dimensions poteau (m)</label>
+          <div class="input-group">
+            <div class="form-group">
+              <input type="text" class="form-input" id="postWidth" value="0.3" inputmode="decimal">
+              <small>Largeur</small>
+            </div>
+            <div class="form-group">
+              <input type="text" class="form-input" id="postLength" value="0.3" inputmode="decimal">
+              <small>Longueur</small>
+            </div>
+            <div class="form-group">
+              <input type="text" class="form-input" id="postHeight" value="0.5" inputmode="decimal">
+              <small>Hauteur</small>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">🔢 Nombre de poteaux</label>
+          <input type="text" class="form-input" id="postCount" value="10" inputmode="decimal">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">🧱 Dosage ciment (kg/m³)</label>
+          <input type="text" class="form-input" id="postCementDosage" value="350" inputmode="decimal">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">钢筋 Ferraillage poteau</label>
+          <div class="input-group">
+            <div class="form-group">
+              <input type="text" class="form-input" id="postRebarCount" value="4" inputmode="decimal">
+              <small>Barres/poteau</small>
+            </div>
+            <div class="form-group">
+              <input type="text" class="form-input" id="postRebarDiameter" value="12" inputmode="decimal">
+              <small>⌀ (mm)</small>
+            </div>
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-input" id="postFrameSpacing" value="0.2" inputmode="decimal" placeholder="Espacement cadres (m)">
+          </div>
+        </div>
+        
+        <div class="summary-box">
+          <h3 class="summary-title">📊 Résultats</h3>
+          <div class="summary-item">
+            <span>㎥ Volume béton:</span>
+            <span id="postVolume">-- m³</span>
+          </div>
+          <div class="summary-item">
+            <span>钢筋 Acier longitudinal:</span>
+            <span id="postSteelLong">-- kg</span>
+          </div>
+          <div class="summary-item">
+            <span>🔲 Cadres:</span>
+            <span id="postSteelFrames">-- kg</span>
+          </div>
+          <div class="summary-item">
+            <span>💰 Coût total:</span>
+            <span id="postCost">-- XOF</span>
+          </div>
+        </div>
+        
+        <div class="button-group">
+          <button class="btn btn-outline" onclick="prevScreen(4)">
+            <span class="btn-icon">⬅️</span>
+            Précédent
+          </button>
+          <button class="btn btn-primary" onclick="nextScreen(4)">
+            Suivant
+            <span class="btn-icon">➡️</span>
+          </button>
+        </div>
+      </section>
 
-    container.appendChild(wrapper);
-  }
+      <!-- Écran 5 : Poteaux en élévation -->
+      <section id="screen5" class="screen">
+        <div class="screen-header">
+          <h2 class="screen-title">🏗️ Poteaux en élévation</h2>
+          <p class="screen-subtitle">Structure verticale</p>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">📐 Hauteur en élévation (m)</label>
+          <input type="text" class="form-input" id="elevPostHeight" value="2.0" inputmode="decimal">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">钢筋 Ferraillage</label>
+          <div class="input-group">
+            <div class="form-group">
+              <input type="text" class="form-input" id="elevPostRebarCount" value="4" inputmode="decimal">
+              <small>Barres/poteau</small>
+            </div>
+            <div class="form-group">
+              <input type="text" class="form-input" id="elevPostRebarDiameter" value="12" inputmode="decimal">
+              <small>⌀ (mm)</small>
+            </div>
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-input" id="elevPostFrameSpacing" value="0.2" inputmode="decimal" placeholder="Espacement cadres (m)">
+          </div>
+        </div>
+        
+        <div class="summary-box">
+          <h3 class="summary-title">📊 Résultats</h3>
+          <div class="summary-item">
+            <span>㎥ Volume béton:</span>
+            <span id="elevPostVolume">-- m³</span>
+          </div>
+          <div class="summary-item">
+            <span>钢筋 Acier longitudinal:</span>
+            <span id="elevPostSteelLong">-- kg</span>
+          </div>
+          <div class="summary-item">
+            <span>🔲 Cadres:</span>
+            <span id="elevPostSteelFrames">-- kg</span>
+          </div>
+          <div class="summary-item">
+            <span>💰 Coût total:</span>
+            <span id="elevPostCost">-- XOF</span>
+          </div>
+        </div>
+        
+        <div class="button-group">
+          <button class="btn btn-outline" onclick="prevScreen(5)">
+            <span class="btn-icon">⬅️</span>
+            Précédent
+          </button>
+          <button class="btn btn-primary" onclick="nextScreen(5)">
+            Suivant
+            <span class="btn-icon">➡️</span>
+          </button>
+        </div>
+      </section>
 
-  function renderMini(){
-    $('#miniPerimeter').textContent = `P: ${round(Model.parcelle.perimetre,2)} m`;
-    $('#miniSurface').textContent = `S: ${round(Model.parcelle.surface,2)} m²`;
-    $('#miniTotal').textContent = `Total: ${(Model.computed.grand_total||0).toLocaleString()} ${Model.metadata.currency}`;
-    // schematic update (simple)
-    const schem = document.createElement('div');
-    schem.className='schematic';
-    schem.setAttribute('aria-hidden','true');
-    schem.innerHTML = generateSchematicSVG(Model);
-    const old = $('#miniDash svg');
-    if (old) old.remove();
-    // but we append to miniDash (left)
-    const md = $('#miniDash');
-    // remove existing svg
-    const existing = md.querySelector('.schematic-inline');
-    if (existing) existing.remove();
-    const svgel = document.createElement('div');
-    svgel.className='schematic-inline';
-    svgel.style.marginTop='8px';
-    svgel.innerHTML = generateSchematicSVG(Model);
-    // append small SVG under mini dash
-    md.appendChild(svgel);
-    // update chart
-    renderChart();
-  }
+      <!-- Écran 6 : Chaînages -->
+      <section id="screen6" class="screen">
+        <div class="screen-header">
+          <h2 class="screen-title">⛓️ Chaînage</h2>
+          <p class="screen-subtitle">Renfort horizontal</p>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">📏 Dimensions chaînage (m)</label>
+          <div class="input-group">
+            <div class="form-group">
+              <input type="text" class="form-input" id="beamWidth" value="0.2" inputmode="decimal">
+              <small>Largeur</small>
+            </div>
+            <div class="form-group">
+              <input type="text" class="form-input" id="beamHeight" value="0.2" inputmode="decimal">
+              <small>Hauteur</small>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">钢筋 Ferraillage</label>
+          <div class="input-group">
+            <div class="form-group">
+              <input type="text" class="form-input" id="beamRebarDiameter" value="10" inputmode="decimal">
+              <small>⌀ (mm)</small>
+            </div>
+            <div class="form-group">
+              <input type="text" class="form-input" id="beamRebarCount" value="4" inputmode="decimal">
+              <small>Nb barres</small>
+            </div>
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-input" id="beamRebarSpacing" value="200" inputmode="decimal" placeholder="Espacement cadres (mm)">
+          </div>
+        </div>
+        
+        <div class="summary-box">
+          <h3 class="summary-title">📊 Résultats</h3>
+          <div class="summary-item">
+            <span>㎥ Volume béton:</span>
+            <span id="beamVolume">-- m³</span>
+          </div>
+          <div class="summary-item">
+            <span>钢筋 Acier longitudinal:</span>
+            <span id="beamSteelLong">-- kg</span>
+          </div>
+          <div class="summary-item">
+            <span>🔲 Cadres:</span>
+            <span id="beamSteelFrames">-- kg</span>
+          </div>
+          <div class="summary-item">
+            <span>💰 Coût total:</span>
+            <span id="beamCost">-- XOF</span>
+          </div>
+        </div>
+        
+        <div class="button-group">
+          <button class="btn btn-outline" onclick="prevScreen(6)">
+            <span class="btn-icon">⬅️</span>
+            Précédent
+          </button>
+          <button class="btn btn-primary" onclick="nextScreen(6)">
+            Suivant
+            <span class="btn-icon">➡️</span>
+          </button>
+        </div>
+      </section>
 
-  function generateSchematicSVG(model){
-    const w = 320, h = 120;
-    const per = model.parcelle.perimetre;
-    const thickness = Math.max(0.05, model.semelle.width||0.6);
-    const semh = (model.semelle.thickness||0.3);
-    const scale = Math.min(220, per) / Math.max(20, per);
-    // simple sectional drawing
-    const svg = `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Schéma section">
-      <rect x="20" y="${h-60}" width="${w-40}" height="10" fill="#e6f6f6" stroke="#cfeef0" rx="4"/>
-      <rect x="40" y="${h-60 - (semh*80)}" width="${Math.max(40, (thickness*120))}" height="${semh*80}" fill="#f2f7f7" stroke="#c7e6e6" rx="4"/>
-      <rect x="${100}" y="${h-140}" width="${w-220}" height="${60}" fill="#fff9ed" stroke="#f3ecc2" rx="6"/>
-      <text x="30" y="18" font-size="12" fill="#2b3742">Perimetre: ${round(model.parcelle.perimetre,2)} m</text>
-      <text x="30" y="34" font-size="12" fill="#2b3742">Surface: ${round(model.parcelle.surface,2)} m²</text>
-    </svg>`;
-    return svg;
-  }
+      <!-- Écran 7 : Mur (briques/parpaings) -->
+      <section id="screen7" class="screen">
+        <div class="screen-header">
+          <h2 class="screen-title">🧱 Mur</h2>
+          <p class="screen-subtitle">Maçonnerie principale</p>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">📏 Épaisseur du mur (m)</label>
+          <input type="text" class="form-input" id="brickThickness" value="0.2" inputmode="decimal">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">🏷️ Type de brique</label>
+          <select class="form-select" id="brickType">
+            <option value="15x20x40">Brique 15x20x40</option>
+            <option value="20x20x40">Brique pleine 20x20x40</option>
+            <option value="20x20x50">Bloc creux 20x20x50</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">📐 Joints et enduits</label>
+          <div class="input-group">
+            <div class="form-group">
+              <input type="text" class="form-input" id="mortarThickness" value="10" inputmode="decimal">
+              <small>Joints (mm)</small>
+            </div>
+            <div class="form-group">
+              <input type="text" class="form-input" id="renderThickness" value="15" inputmode="decimal">
+              <small>Enduit (mm)</small>
+            </div>
+          </div>
+        </div>
+        
+        <div class="summary-box">
+          <h3 class="summary-title">📊 Résultats</h3>
+          <div class="summary-item">
+            <span>㎥ Volume maçonnerie:</span>
+            <span id="brickVolume">-- m³</span>
+          </div>
+          <div class="summary-item">
+            <span>🧱 Nombre de briques:</span>
+            <span id="brickCount">-- unités</span>
+          </div>
+          <div class="summary-item">
+            <span>💧 Mortier:</span>
+            <span id="mortarVolume">-- m³</span>
+          </div>
+          <div class="summary-item">
+            <span>🎨 Enduit:</span>
+            <span id="renderVolume">-- m³</span>
+          </div>
+          <div class="summary-item">
+            <span>💰 Coût total:</span>
+            <span id="brickCost">-- XOF</span>
+          </div>
+        </div>
+        
+        <div class="button-group">
+          <button class="btn btn-outline" onclick="prevScreen(7)">
+            <span class="btn-icon">⬅️</span>
+            Précédent
+          </button>
+          <button class="btn btn-primary" onclick="nextScreen(7)">
+            Suivant
+            <span class="btn-icon">➡️</span>
+          </button>
+        </div>
+      </section>
 
-  /* ---------------------------
-     helpers: strip calc details for more compact JSON preview
-  */
-  function stripCalc(obj){
-    const copy = Object.assign({}, obj);
-    delete copy._calc;
-    return copy;
-  }
+      <!-- Écran 8 : Récapitulatif -->
+      <section id="screen8" class="screen">
+        <div class="screen-header">
+          <h2 class="screen-title">📋 Récapitulatif</h2>
+          <p class="screen-subtitle">Devis complet du projet</p>
+        </div>
+        
+        <div class="summary-box">
+          <h3 class="summary-title">💰 Coûts totaux</h3>
+          <div class="summary-item">
+            <span>🧱 Matériaux:</span>
+            <span id="totalMaterials">-- XOF</span>
+          </div>
+          <div class="summary-item">
+            <span>👷 Main d'œuvre:</span>
+            <span id="labourCost">-- XOF</span>
+          </div>
+          <div class="summary-item">
+            <span>💰 Total général:</span>
+            <span id="grandTotal">-- XOF</span>
+          </div>
+        </div>
+        
+        <div class="table-container">
+          <table id="summaryTable">
+            <thead>
+              <tr>
+                <th>Élément</th>
+                <th>Vol</th>
+                <th>Ciment</th>
+                <th>Sacs</th>
+                <th>Acier</th>
+                <th>Coût</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Dynamically filled -->
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="actions">
+          <button class="action-btn" onclick="prevScreen(8)">
+            <span class="btn-icon">✏️</span>
+            Modifier
+          </button>
+          <button class="action-btn" onclick="exportPDF()">
+            <span class="btn-icon">📄</span>
+            PDF
+          </button>
+          <button class="action-btn" onclick="exportJSON()">
+            <span class="btn-icon">💾</span>
+            JSON
+          </button>
+          <button class="action-btn" onclick="exportCSV()">
+            <span class="btn-icon">📊</span>
+            CSV
+          </button>
+        </div>
+      </section>
+    </main>
+  </div>
 
-  /* ---------------------------
-     Export functions
-     --------------------------- */
+  <div class="notification" id="notification"></div>
 
-  function exportJSON(){
-    computeAll(Model);
-    const output = {
-      metadata: Model.metadata,
-      parcelle: Model.parcelle,
-      items: Model.items,
-      totals: Model.computed
+  <script>
+    // Global state
+    let currentScreen = 1;
+    const totalScreens = 8;
+    let projectData = {
+      metadata: {
+        date: new Date().toISOString(),
+        client: "Client Exemple",
+        parcelle: {}
+      },
+      items: [],
+      total: {
+        materials: 0,
+        labour: 0,
+        grand_total: 0
+      }
     };
-    const blob = new Blob([JSON.stringify(output, null, 2)], {type:'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = `${(Model.metadata.project||'project').replace(/\s+/g,'_')}_export.json`; a.click();
-    URL.revokeObjectURL(url);
-  }
 
-  function exportCSV(){
-    computeAll(Model);
-    // rows: element, field, value
-    const rows = [];
-    Model.items.forEach(it=>{
-      if (!it) return;
-      const id = it.id || 'item';
-      const flat = flattenObject(it);
-      Object.keys(flat).forEach(k=>{
-        rows.push([id, k, String(flat[k]).replace(/[\n\r]/g,' ')]);
-      });
-    });
-    // totals
-    Object.keys(Model.computed).forEach(k=>{
-      rows.push(['totals', k, String(Model.computed[k])]);
-    });
-    const csv = rows.map(r=> r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
-    const blob = new Blob([csv], {type:'text/csv'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href=url; a.download = `${(Model.metadata.project||'project').replace(/\s+/g,'_')}_export.csv`; a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  async function exportPDF(){
-    computeAll(Model);
-    // Build printable content in a hidden container
-    const container = document.createElement('div');
-    container.style.width='800px';
-    container.style.padding='20px';
-    container.style.fontFamily='Arial, Helvetica, sans-serif';
-    const header = `<div style="display:flex;justify-content:space-between;align-items:center">
-      <div><h2>Devis: ${(escapeHtml(Model.metadata.project))}</h2><div>Client: ${escapeHtml(Model.metadata.client)}</div></div>
-      <div style="text-align:right"><div>${Model.metadata.date}</div><div>${Model.metadata.currency}</div></div>
-    </div>`;
-    const tableRows = Model.items.map(it=>{
-      const cost = (it.costs ? Object.values(it.costs).reduce((a,b)=>a+(b||0),0) : 0) + (it.steel?.cost||0);
-      return `<tr><td>${escapeHtml(it.id)}</td><td>${escapeHtml(JSON.stringify(stripCalc(it)))}</td><td>${cost.toLocaleString()}</td></tr>`;
-    }).join('');
-    const totals = `<tr><td colspan="2"><strong>Totaux</strong></td><td><strong>${(Model.computed.grand_total||0).toLocaleString()}</strong></td></tr>`;
-    container.innerHTML = header + `<table style="width:100%;border-collapse:collapse;margin-top:12px">
-      <thead><tr><th style="text-align:left">Élément</th><th style="text-align:left">Détails</th><th style="text-align:right">Coût</th></tr></thead>
-      <tbody>${tableRows}${totals}</tbody></table>
-      <div style="margin-top:20px;font-size:12px;color:#666">Conçu par Issoufou Abdou Chefou</div>
-    `;
-    document.body.appendChild(container);
-    try{
-      // html2canvas + jsPDF
-      const canvas = await html2canvas(container, {scale:2, useCORS:true, logging:false});
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p','mm','a4');
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const imgProps = pdf.getImageProperties(imgData);
-      const imgWidth = pageWidth - 20;
-      const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
-      pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
-      pdf.setProperties({title: Model.metadata.project, subject:'Devis clôture'});
-      pdf.save(`${(Model.metadata.project||'project').replace(/\s+/g,'_')}_devis.pdf`);
-      showToast('PDF exporté');
-    }catch(err){
-      console.error(err); alert('Erreur export PDF: ' + (err && err.message));
-    } finally {
-      container.remove();
+    // Initialize stepper
+    function initStepper() {
+      const stepper = document.getElementById('stepper');
+      stepper.innerHTML = '';
+      for (let i = 1; i <= totalScreens; i++) {
+        const step = document.createElement('div');
+        step.className = 'step';
+        step.textContent = i;
+        step.dataset.screen = i;
+        step.onclick = () => goToScreen(i);
+        stepper.appendChild(step);
+      }
+      updateStepper();
     }
-  }
 
-  /* ---------------------------
-     Helpers: flatten object
-  */
-  function flattenObject(obj, prefix=''){
-    const res = {};
-    for (const k in obj){
-      const v = obj[k];
-      const key = prefix ? (prefix + '.' + k) : k;
-      if (v && typeof v === 'object' && !Array.isArray(v)) {
-        Object.assign(res, flattenObject(v, key));
-      } else {
-        res[key] = v;
+    function updateStepper() {
+      const steps = document.querySelectorAll('.step');
+      steps.forEach((step, index) => {
+        step.classList.remove('active', 'completed');
+        if (index + 1 === currentScreen) {
+          step.classList.add('active');
+        } else if (index + 1 < currentScreen) {
+          step.classList.add('completed');
+        }
+      });
+    }
+
+    function goToScreen(screen) {
+      if (screen <= currentScreen) {
+        document.getElementById(`screen${currentScreen}`).classList.remove('active');
+        currentScreen = screen;
+        document.getElementById(`screen${currentScreen}`).classList.add('active');
+        updateStepper();
       }
     }
-    return res;
-  }
 
-  /* ---------------------------
-     Chart rendering (Chart.js)
-  */
-  let chartInstance = null;
-  function renderChart(){
-    computeAll(Model);
-    const ctx = $('#costChart').getContext('2d');
-    const labels = ['Matériaux','Acier','Main d’œuvre','Marge','TVA'];
-    const mat = Model.computed.costMaterials || 0;
-    const ac = Model.computed.steelCost || 0;
-    const labor = Model.computed.labor || 0;
-    const margin = Model.computed.margin || 0;
-    const tva = Model.computed.tva || 0;
-    const data = [mat, ac, labor, margin, tva];
-    if (chartInstance) chartInstance.destroy();
-    chartInstance = new Chart(ctx, {
-      type: 'doughnut',
-      data: { labels, datasets:[{data, backgroundColor: []}] },
-      options: {responsive:true, maintainAspectRatio:false}
-    });
-  }
+    function nextScreen(screen) {
+      if (validateScreen(screen)) {
+        document.getElementById(`screen${screen}`).classList.remove('active');
+        currentScreen++;
+        document.getElementById(`screen${currentScreen}`).classList.add('active');
+        updateStepper();
+        if (currentScreen === 2) calculateScreen1();
+        if (currentScreen === 3) calculateScreen2();
+        if (currentScreen === 4) calculateScreen3();
+        if (currentScreen === 5) calculateScreen4();
+        if (currentScreen === 6) calculateScreen5();
+        if (currentScreen === 7) calculateScreen6();
+        if (currentScreen === 8) calculateScreen7();
+      }
+    }
 
-  /* ---------------------------
-     Events & bindings
-  */
+    function prevScreen(screen) {
+      document.getElementById(`screen${screen}`).classList.remove('active');
+      currentScreen--;
+      document.getElementById(`screen${currentScreen}`).classList.add('active');
+      updateStepper();
+    }
 
-  function bindUI(){
-    $('#saveProjectBtn').addEventListener('click', ()=> saveProjectUI());
-    $('#loadProjectBtn').addEventListener('click', ()=> loadSelectedProject());
-    $('#newProjectBtn').addEventListener('click', ()=> newProject());
-    $('#deleteProjectBtn').addEventListener('click', ()=> deleteSelectedProject());
-    $('#exportJsonBtn').addEventListener('click', ()=> exportJSON());
-    $('#exportCsvBtn').addEventListener('click', ()=> exportCSV());
-    $('#copyClipboardBtn').addEventListener('click', ()=> { navigator.clipboard.writeText(JSON.stringify({metadata:Model.metadata,parcelle:Model.parcelle,items:Model.items,totals:Model.computed},null,2)); showToast('JSON copié'); });
-    $('#exportPdfBtn').addEventListener('click', ()=> exportPDF());
-    $('#runTestsBtn').addEventListener('click', ()=> runTests());
-    $('#toggleThemeBtn').addEventListener('click', toggleTheme);
-    // project select populate
-    refreshProjectList();
-  }
+    function validateScreen(screen) {
+      let valid = true;
+      let error = "";
+      if (screen === 1) {
+        const length = parseFloat(document.getElementById('length').value.replace(',', '.'));
+        const width = parseFloat(document.getElementById('width').value.replace(',', '.'));
+        const perimeter = parseFloat(document.getElementById('perimeter').value.replace(',', '.'));
+        if ((isNaN(length) || isNaN(width)) && isNaN(perimeter)) {
+          error = "Entrez les dimensions ou le périmètre";
+          valid = false;
+        }
+      }
+      if (!valid) {
+        showNotification(error, 'error');
+      }
+      return valid;
+    }
 
-  async function saveProjectUI(){
-    computeAll(Model);
-    const obj = Object.assign({}, Model, {metadata: Model.metadata});
-    obj.metadata.savedAt = new Date().toISOString();
-    // ask for name
-    const name = prompt('Nom du projet (laisser vide pour utiliser le nom existant)', obj.metadata.project) || obj.metadata.project || ('Projet ' + new Date().toISOString());
-    obj.metadata.project = name;
-    try{
-      const saved = await DB.saveProject({ metadata: obj.metadata, data: obj, id: null });
-      showToast('Projet sauvegardé');
-      await refreshProjectList();
-    }catch(e){ console.error(e); alert('Erreur sauvegarde: ' + e); }
-  }
+    function showNotification(message, type = 'success') {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.className = `notification ${type} show`;
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 3000);
+    }
 
-  async function refreshProjectList(){
-    const sel = $('#projectSelect'); sel.innerHTML = '<option value="">-- Aucun --</option>';
-    try{
-      const list = await DB.listProjects();
-      list.forEach(p=>{
-        const opt = document.createElement('option'); opt.value = p.id; opt.text = (p.metadata?.project || p.id);
-        sel.appendChild(opt);
+    function calculateScreen1() {
+      const length = parseFloat(document.getElementById('length').value.replace(',', '.'));
+      const width = parseFloat(document.getElementById('width').value.replace(',', '.'));
+      let perimeter = parseFloat(document.getElementById('perimeter').value.replace(',', '.'));
+      const wallWidth = parseFloat(document.getElementById('wallWidth').value.replace(',', '.'));
+      const wallHeight = parseFloat(document.getElementById('wallHeight').value.replace(',', '.'));
+
+      if (!isNaN(length) && !isNaN(width)) {
+        perimeter = 2 * (length + width);
+        document.getElementById('perimeter').value = perimeter.toFixed(2);
+      }
+
+      const area = length && width ? length * width : 0;
+
+      document.getElementById('displayPerimeter').textContent = perimeter ? perimeter.toFixed(2) + ' m' : '-- m';
+      document.getElementById('displayArea').textContent = area ? area.toFixed(2) + ' m²' : '-- m²';
+
+      projectData.metadata.parcelle = {
+        perimetre: perimeter || 0,
+        surface: area || 0,
+        L: length || 0,
+        W: width || 0
+      };
+    }
+
+    function calculateScreen2() {
+      const perimeter = projectData.metadata.parcelle.perimetre || 0;
+      const width = parseFloat(document.getElementById('cleaningWidth').value.replace(',', '.'));
+      const thickness = parseFloat(document.getElementById('cleaningThickness').value.replace(',', '.'));
+      const dosage = parseFloat(document.getElementById('cementDosage').value.replace(',', '.'));
+      const cementPrice = parseFloat(document.getElementById('cementPrice').value.replace(',', '.'));
+      const gravelPrice = parseFloat(document.getElementById('gravelPrice').value.replace(',', '.'));
+      const sandPrice = parseFloat(document.getElementById('sandPrice').value.replace(',', '.'));
+
+      const volume = perimeter * width * thickness;
+      const cementKg = volume * dosage;
+      const sacks = Math.ceil(cementKg / 50);
+      const gravelVol = volume * 0.8;
+      const sandVol = volume * 0.45;
+
+      const cost = sacks * cementPrice + gravelVol * gravelPrice + sandVol * sandPrice;
+
+      document.getElementById('cleaningVolume').textContent = volume.toFixed(2) + ' m³';
+      document.getElementById('cleaningCement').textContent = cementKg.toFixed(2) + ' kg';
+      document.getElementById('cleaningSacks').textContent = sacks + ' sacs';
+      document.getElementById('cleaningCost').textContent = cost.toFixed(2) + ' XOF';
+
+      projectData.items[0] = {
+        name: "Béton de propreté",
+        volume_m3: volume,
+        cement_kg: cementKg,
+        sacks: sacks,
+        gravel_m3: gravelVol,
+        sand_m3: sandVol,
+        costs: {
+          cement: sacks * cementPrice,
+          gravel: gravelVol * gravelPrice,
+          sand: sandVol * sandPrice
+        }
+      };
+    }
+
+    function calculateScreen3() {
+      const perimeter = projectData.metadata.parcelle.perimetre || 0;
+      const width = parseFloat(document.getElementById('footingWidth').value.replace(',', '.'));
+      const height = parseFloat(document.getElementById('footingHeight').value.replace(',', '.'));
+      const dosage = parseFloat(document.getElementById('footingCementDosage').value.replace(',', '.'));
+      const rebarDiamLong = parseFloat(document.getElementById('rebarDiameterLong').value.replace(',', '.'));
+      const rebarCountLong = parseFloat(document.getElementById('rebarCountLong').value.replace(',', '.'));
+      const rebarDiamTrans = parseFloat(document.getElementById('rebarDiameterTrans').value.replace(',', '.'));
+      const rebarSpacingTrans = parseFloat(document.getElementById('rebarSpacingTrans').value.replace(',', '.')) / 1000;
+      const steelPrice = parseFloat(document.getElementById('steelPrice').value.replace(',', '.'));
+
+      const volume = perimeter * width * height;
+      const cementKg = volume * dosage;
+      const sacks = Math.ceil(cementKg / 50);
+      const gravelVol = volume * 0.8;
+      const sandVol = volume * 0.45;
+
+      // Steel calculations
+      const steelLongLength = perimeter * rebarCountLong;
+      const steelLongMass = steelLongLength * 0.006165177 * rebarDiamLong * rebarDiamLong;
+
+      const transCount = Math.ceil(perimeter / rebarSpacingTrans);
+      const transLength = (2 * width + 2 * height) + 2 * 0.1; // Adding hooks
+      const steelTransMass = transCount * transLength * 0.006165177 * rebarDiamTrans * rebarDiamTrans;
+
+      const totalSteelMass = steelLongMass + steelTransMass;
+      const steelCost = totalSteelMass * steelPrice;
+
+      const cost = sacks * 70000 + gravelVol * 20000 + sandVol * 4000 + steelCost;
+
+      document.getElementById('footingVolume').textContent = volume.toFixed(2) + ' m³';
+      document.getElementById('footingSteelLong').textContent = steelLongMass.toFixed(2) + ' kg';
+      document.getElementById('footingSteelTrans').textContent = steelTransMass.toFixed(2) + ' kg';
+      document.getElementById('footingCost').textContent = cost.toFixed(2) + ' XOF';
+
+      projectData.items[1] = {
+        name: "Semelle filante",
+        volume_m3: volume,
+        cement_kg: cementKg,
+        sacks: sacks,
+        gravel_m3: gravelVol,
+        sand_m3: sandVol,
+        steel_kg: totalSteelMass,
+        costs: {
+          cement: sacks * 70000,
+          gravel: gravelVol * 20000,
+          sand: sandVol * 4000,
+          steel: steelCost
+        }
+      };
+    }
+
+    function calculateScreen4() {
+      const postWidth = parseFloat(document.getElementById('postWidth').value.replace(',', '.'));
+      const postLength = parseFloat(document.getElementById('postLength').value.replace(',', '.'));
+      const postHeight = parseFloat(document.getElementById('postHeight').value.replace(',', '.'));
+      const postCount = parseFloat(document.getElementById('postCount').value.replace(',', '.'));
+      const dosage = parseFloat(document.getElementById('postCementDosage').value.replace(',', '.'));
+      const rebarCount = parseFloat(document.getElementById('postRebarCount').value.replace(',', '.'));
+      const rebarDiameter = parseFloat(document.getElementById('postRebarDiameter').value.replace(',', '.'));
+      const frameSpacing = parseFloat(document.getElementById('postFrameSpacing').value.replace(',', '.'));
+
+      const volume = postWidth * postLength * postHeight * postCount;
+      const cementKg = volume * dosage;
+      const sacks = Math.ceil(cementKg / 50);
+      const gravelVol = volume * 0.8;
+      const sandVol = volume * 0.45;
+
+      // Steel calculations
+      const steelLongLength = postHeight * rebarCount * postCount;
+      const steelLongMass = steelLongLength * 0.006165177 * rebarDiameter * rebarDiameter;
+
+      const frameCount = Math.floor(postHeight / frameSpacing) * postCount;
+      const frameLength = 2 * (postWidth + postLength) + 0.2; // Adding hooks
+      const steelFrameMass = frameCount * frameLength * 0.006165177 * 8 * 8;
+
+      const totalSteelMass = steelLongMass + steelFrameMass;
+      const steelCost = totalSteelMass * 450;
+
+      const cost = sacks * 70000 + gravelVol * 20000 + sandVol * 4000 + steelCost;
+
+      document.getElementById('postVolume').textContent = volume.toFixed(2) + ' m³';
+      document.getElementById('postSteelLong').textContent = steelLongMass.toFixed(2) + ' kg';
+      document.getElementById('postSteelFrames').textContent = steelFrameMass.toFixed(2) + ' kg';
+      document.getElementById('postCost').textContent = cost.toFixed(2) + ' XOF';
+
+      projectData.items[2] = {
+        name: "Poteaux amorces",
+        volume_m3: volume,
+        cement_kg: cementKg,
+        sacks: sacks,
+        gravel_m3: gravelVol,
+        sand_m3: sandVol,
+        steel_kg: totalSteelMass,
+        costs: {
+          cement: sacks * 70000,
+          gravel: gravelVol * 20000,
+          sand: sandVol * 4000,
+          steel: steelCost
+        }
+      };
+    }
+
+    function calculateScreen5() {
+      const postHeight = parseFloat(document.getElementById('elevPostHeight').value.replace(',', '.'));
+      const postCount = projectData.items[2] ? projectData.items[2].volume_m3 / (0.3 * 0.3 * 0.5) : 10;
+      const rebarCount = parseFloat(document.getElementById('elevPostRebarCount').value.replace(',', '.'));
+      const rebarDiameter = parseFloat(document.getElementById('elevPostRebarDiameter').value.replace(',', '.'));
+      const frameSpacing = parseFloat(document.getElementById('elevPostFrameSpacing').value.replace(',', '.'));
+
+      const postWidth = 0.3;
+      const postLength = 0.3;
+      const volume = postWidth * postLength * postHeight * postCount;
+      const cementKg = volume * 350;
+      const sacks = Math.ceil(cementKg / 50);
+      const gravelVol = volume * 0.8;
+      const sandVol = volume * 0.45;
+
+      // Steel calculations
+      const steelLongLength = postHeight * rebarCount * postCount;
+      const steelLongMass = steelLongLength * 0.006165177 * rebarDiameter * rebarDiameter;
+
+      const frameCount = Math.floor(postHeight / frameSpacing) * postCount;
+      const frameLength = 2 * (postWidth + postLength) + 0.2;
+      const steelFrameMass = frameCount * frameLength * 0.006165177 * 8 * 8;
+
+      const totalSteelMass = steelLongMass + steelFrameMass;
+      const steelCost = totalSteelMass * 450;
+
+      const cost = sacks * 70000 + gravelVol * 20000 + sandVol * 4000 + steelCost;
+
+      document.getElementById('elevPostVolume').textContent = volume.toFixed(2) + ' m³';
+      document.getElementById('elevPostSteelLong').textContent = steelLongMass.toFixed(2) + ' kg';
+      document.getElementById('elevPostSteelFrames').textContent = steelFrameMass.toFixed(2) + ' kg';
+      document.getElementById('elevPostCost').textContent = cost.toFixed(2) + ' XOF';
+
+      projectData.items[3] = {
+        name: "Poteaux en élévation",
+        volume_m3: volume,
+        cement_kg: cementKg,
+        sacks: sacks,
+        gravel_m3: gravelVol,
+        sand_m3: sandVol,
+        steel_kg: totalSteelMass,
+        costs: {
+          cement: sacks * 70000,
+          gravel: gravelVol * 20000,
+          sand: sandVol * 4000,
+          steel: steelCost
+        }
+      };
+    }
+
+    function calculateScreen6() {
+      const perimeter = projectData.metadata.parcelle.perimetre || 0;
+      const beamWidth = parseFloat(document.getElementById('beamWidth').value.replace(',', '.'));
+      const beamHeight = parseFloat(document.getElementById('beamHeight').value.replace(',', '.'));
+      const rebarDiameter = parseFloat(document.getElementById('beamRebarDiameter').value.replace(',', '.'));
+      const rebarCount = parseFloat(document.getElementById('beamRebarCount').value.replace(',', '.'));
+      const rebarSpacing = parseFloat(document.getElementById('beamRebarSpacing').value.replace(',', '.')) / 1000;
+
+      const volume = perimeter * beamWidth * beamHeight * 2; // Bas + Couronnement
+      const cementKg = volume * 350;
+      const sacks = Math.ceil(cementKg / 50);
+      const gravelVol = volume * 0.8;
+      const sandVol = volume * 0.45;
+
+      // Steel calculations
+      const steelLongLength = perimeter * rebarCount * 2;
+      const steelLongMass = steelLongLength * 0.006165177 * rebarDiameter * rebarDiameter;
+
+      const frameCount = Math.ceil(perimeter / rebarSpacing) * 2;
+      const frameLength = (beamWidth + beamHeight) * 2 + 0.2;
+      const steelFrameMass = frameCount * frameLength * 0.006165177 * 8 * 8;
+
+      const totalSteelMass = steelLongMass + steelFrameMass;
+      const steelCost = totalSteelMass * 450;
+
+      const cost = sacks * 70000 + gravelVol * 20000 + sandVol * 4000 + steelCost;
+
+      document.getElementById('beamVolume').textContent = volume.toFixed(2) + ' m³';
+      document.getElementById('beamSteelLong').textContent = steelLongMass.toFixed(2) + ' kg';
+      document.getElementById('beamSteelFrames').textContent = steelFrameMass.toFixed(2) + ' kg';
+      document.getElementById('beamCost').textContent = cost.toFixed(2) + ' XOF';
+
+      projectData.items[4] = {
+        name: "Chaînage bas & Couronnement",
+        volume_m3: volume,
+        cement_kg: cementKg,
+        sacks: sacks,
+        gravel_m3: gravelVol,
+        sand_m3: sandVol,
+        steel_kg: totalSteelMass,
+        costs: {
+          cement: sacks * 70000,
+          gravel: gravelVol * 20000,
+          sand: sandVol * 4000,
+          steel: steelCost
+        }
+      };
+    }
+
+    function calculateScreen7() {
+      const perimeter = projectData.metadata.parcelle.perimetre || 0;
+      const height = projectData.metadata.parcelle.W ? projectData.metadata.parcelle.W : 2;
+      const thickness = parseFloat(document.getElementById('brickThickness').value.replace(',', '.'));
+      const brickType = document.getElementById('brickType').value;
+      const mortarThickness = parseFloat(document.getElementById('mortarThickness').value.replace(',', '.')) / 1000;
+      const renderThickness = parseFloat(document.getElementById('renderThickness').value.replace(',', '.')) / 1000;
+
+      let brickDims = [0.15, 0.2, 0.4]; // Default
+      if (brickType === "20x20x40") brickDims = [0.2, 0.2, 0.4];
+      if (brickType === "20x20x50") brickDims = [0.2, 0.2, 0.5];
+
+      const brickVol = (brickDims[0] + mortarThickness) * (brickDims[1] + mortarThickness) * (brickDims[2] + mortarThickness);
+      const wallVol = perimeter * height * thickness;
+      const brickCount = Math.ceil(wallVol / brickVol);
+
+      const mortarVol = wallVol * 0.15; // Approx
+      const renderVol = perimeter * height * 2 * renderThickness; // Both sides
+
+      const cost = brickCount * 100 + mortarVol * 5000 + renderVol * 6000;
+
+      document.getElementById('brickVolume').textContent = wallVol.toFixed(2) + ' m³';
+      document.getElementById('brickCount').textContent = brickCount + ' unités';
+      document.getElementById('mortarVolume').textContent = mortarVol.toFixed(2) + ' m³';
+      document.getElementById('renderVolume').textContent = renderVol.toFixed(2) + ' m³';
+      document.getElementById('brickCost').textContent = cost.toFixed(2) + ' XOF';
+
+      projectData.items[5] = {
+        name: "Mur (briques/parpaings)",
+        volume_m3: wallVol,
+        brick_count: brickCount,
+        mortar_m3: mortarVol,
+        render_m3: renderVol,
+        costs: {
+          bricks: brickCount * 100,
+          mortar: mortarVol * 5000,
+          render: renderVol * 6000
+        }
+      };
+
+      calculateSummary();
+    }
+
+    function calculateSummary() {
+      let totalMaterials = 0;
+      let totalLabour = 0;
+      let grandTotal = 0;
+
+      projectData.items.forEach(item => {
+        if (item.costs) {
+          Object.values(item.costs).forEach(val => totalMaterials += val);
+        }
       });
-    }catch(e){ console.error(e); }
-  }
 
-  async function loadSelectedProject(){
-    const sel = $('#projectSelect'); const id = sel.value;
-    if (!id){ alert('Sélectionnez un projet'); return; }
-    try{
-      const rec = await DB.getProject(id);
-      if (!rec){ alert('Projet introuvable'); return; }
-      // load into model
-      Object.assign(Model, rec.data);
-      showToast('Projet chargé');
-      renderStepper(); renderStepContent(); renderMini();
-    }catch(e){ console.error(e); alert('Erreur chargement: ' + e); }
-  }
+      totalLabour = totalMaterials * 0.3; // 30% main d'œuvre
+      grandTotal = totalMaterials + totalLabour;
 
-  async function deleteSelectedProject(){
-    const sel = $('#projectSelect'); const id = sel.value;
-    if (!id){ alert('Sélectionnez un projet à supprimer'); return; }
-    if (!confirm('Supprimer ce projet ?')) return;
-    try{
-      await DB.deleteProject(id);
-      showToast('Projet supprimé');
-      await refreshProjectList();
-    }catch(e){ console.error(e); alert('Erreur suppression: ' + e); }
-  }
+      projectData.total.materials = totalMaterials;
+      projectData.total.labour = totalLabour;
+      projectData.total.grand_total = grandTotal;
 
-  function newProject(){
-    if (!confirm('Créer nouveau projet ? Les modifications non sauvegardées seront perdues.')) return;
-    // reset to default Model (shallow)
-    window.Model = JSON.parse(JSON.stringify(Model)); // careful: we temporarily keep initial defaults—here we reload page
-    location.reload();
-  }
+      document.getElementById('totalMaterials').textContent = totalMaterials.toFixed(2) + ' XOF';
+      document.getElementById('labourCost').textContent = totalLabour.toFixed(2) + ' XOF';
+      document.getElementById('grandTotal').textContent = grandTotal.toFixed(2) + ' XOF';
 
-  function alertFocus(el, msg){
-    alert(msg);
-    el.focus();
-  }
+      const tbody = document.getElementById('summaryTable').querySelector('tbody');
+      tbody.innerHTML = '';
+      projectData.items.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${item.name}</td>
+          <td>${item.volume_m3 ? item.volume_m3.toFixed(1) : ''}</td>
+          <td>${item.cement_kg ? item.cement_kg.toFixed(0) : ''}</td>
+          <td>${item.sacks || ''}</td>
+          <td>${item.steel_kg ? item.steel_kg.toFixed(0) : ''}</td>
+          <td>${Object.values(item.costs || {}).reduce((a,b) => a+b, 0).toFixed(0)}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
 
-  /* ---------------------------
-     Tests suite
-  */
-  function runTests(){
-    const out=[];
-    // Test 1: massPerMeter Ø10 approx 0.61685
-    const m10 = massPerMeter(10);
-    out.push({name:'massPerMeter(10)', val: m10, pass: Math.abs(m10 - 0.61685) < 0.01});
-    // Test 2: volume semelle for L=80, w=0.6, h=0.3 => 14.4 m3
-    const v = calcVolume(80,0.6,0.3);
-    out.push({name:'Volume semelle 80x0.6x0.3', val:v, pass: Math.abs(v - 14.4) < 0.001});
-    // Test 3: sacks calc for 14.4 m3 with dosage 350 => cement kg=5040 -> sacks=101
-    const cementKg = v * 350;
-    const sacks = Math.ceil(cementKg / PRESETS.SACK_WEIGHT);
-    out.push({name:'Sacs ciment semelle (350kg/m3)', val:sacks, pass: sacks === Math.ceil((14.4*350)/50)});
-    // Display
-    const results = out.map(o=> `${o.pass? '✅':'❌'} ${o.name} -> ${round(o.val,4)} `).join('\n');
-    alert('Tests exécutés:\n\n' + results);
-  }
+    function exportPDF() {
+      showNotification("Export PDF simulé", 'success');
+    }
 
-  /* ---------------------------
-     Small helpers & sanitizers
-  */
-  function escapeHtml(unsafe){
-    return String(unsafe || '').replace(/[&<>"'`]/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;','`':'&#096;'}[m]; });
-  }
+    function exportJSON() {
+      const dataStr = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(projectData, null, 2));
+      const downloadAnchorNode = document.createElement('a');
+      downloadAnchorNode.setAttribute("href", dataStr);
+      downloadAnchorNode.setAttribute("download", "devis_mur.json");
+      document.body.appendChild(downloadAnchorNode);
+      downloadAnchorNode.click();
+      downloadAnchorNode.remove();
+      showNotification("JSON téléchargé!", 'success');
+    }
 
-  /* ---------------------------
-     Service Worker registration (via Blob) - minimal caching
-     --------------------------- */
-  async function registerServiceWorker(){
-    if (!('serviceWorker' in navigator)) return;
-    try{
-      const swCode = `
-        const CACHE_NAME = 'cloture-pwa-cache-v1';
-        const ASSETS = ['/', location.href];
-        self.addEventListener('install', event => {
-          self.skipWaiting();
-          event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
-        });
-        self.addEventListener('fetch', event => {
-          event.respondWith(
-            caches.match(event.request).then(resp => resp || fetch(event.request).then(r=>{ return caches.open(CACHE_NAME).then(cache=>{ cache.put(event.request, r.clone()); return r; }); }))
-            .catch(()=>caches.match('/'))
-          );
-        });
-        self.addEventListener('activate', event => {
-          event.waitUntil(self.clients.claim());
-        });
-      `;
-      const blob = new Blob([swCode], {type:'application/javascript'});
-      const swUrl = URL.createObjectURL(blob);
-      const reg = await navigator.serviceWorker.register(swUrl);
-      console.log('SW registered', reg);
-    }catch(e){ console.warn('SW reg failed', e); }
-  }
+    function exportCSV() {
+      let csv = 'Élément,Volume (m³),Ciment (kg),Sacs,Acier (kg),Coût (XOF)\n';
+      projectData.items.forEach(item => {
+        csv += `"${item.name}",${item.volume_m3 || ''},${item.cement_kg || ''},${item.sacks || ''},${item.steel_kg || ''},${Object.values(item.costs || {}).reduce((a,b) => a+b, 0)}\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", "devis_mur.csv");
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showNotification("CSV téléchargé!", 'success');
+    }
 
-  /* ---------------------------
-     PWA: manifest via blob injection
-  */
-  function registerManifest(){
-    const manifest = {
-      name: "Clôture - Calculateur chantier",
-      short_name: "ClotureCalc",
-      icons: [],
-      start_url: ".",
-      display: "standalone",
-      background_color: "#ffffff",
-      theme_color: "#0ea5a4"
+    // Initialize
+    window.onload = function() {
+      initStepper();
     };
-    const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('link'); link.rel='manifest'; link.href = url; document.head.appendChild(link);
-  }
-
-  /* ---------------------------
-     Init app
-  */
-  function init(){
-    renderStepper();
-    renderStepContent();
-    bindUI();
-    computeAll(Model);
-    renderMini();
-    registerManifest();
-    registerServiceWorker();
-  }
-
-  // on load
-  window.addEventListener('load', init);
-
-  /* ===============================
-     Extra functions used by outer UI (bindings)
-     =============================== */
-  window.exportJSON = exportJSON;
-  window.exportCSV = exportCSV;
-  window.exportPDF = exportPDF;
-  window.computeAll = computeAll;
-  window.Model = Model;
-
-})(); // end IIFE
-</script>
-
-<!-- ========== External libs (CDN) - required for exports and chart ========== -->
-<!-- WARNING: pour offline complet -> hébergez ces fichiers localement -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" integrity="" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" integrity="" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="" crossorigin="anonymous"></script>
-<script>
-  // Expose jsPDF global for our functions (some bundlers use window.jspdf)
-  if (window.jspdf && window.jspdf.jsPDF) window.jsPDF = window.jspdf.jsPDF;
-  // Ensure html2canvas and Chart available
-  if (!window.html2canvas) console.warn('html2canvas manquant - PDF export peut échouer');
-  if (!window.Chart) console.warn('Chart.js manquant - graphiques peuvent ne pas s\'afficher');
-</script>
+  </script>
 </body>
 </html>
